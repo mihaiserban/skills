@@ -1,5 +1,7 @@
 # Issue tracker: GitHub
 
+> Adapted from [mattpocock/skills](https://github.com/mattpocock/skills)
+
 Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
 
 ## Conventions

@@ -1,5 +1,7 @@
 # CONTEXT.md Format
 
+> Adapted from [mattpocock/skills](https://github.com/mattpocock/skills)
+
 ## Structure
 
 ```md
