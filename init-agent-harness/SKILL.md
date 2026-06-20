@@ -14,6 +14,54 @@ This skill initializes the full pi agent harness in a repository. The output is
 a working setup: agent files, satellite docs, mechanical lint enforcement, git
 gates, and session-start bootstrapping.
 
+## Prerequisites
+
+This skill is built for the **pi coding agent** and its extension ecosystem.
+Without the environment-level dependencies below, the harness it creates will
+produce agent files referencing non-existent APIs.
+
+### Environment (must exist before running this skill)
+
+| Dependency | Version check | Required for |
+|---|---|---|
+| [pi](https://pi-agent.dev) | `pi --version` | Agent file format, `.pi/` conventions, `subagent()` API |
+| [context-mode](https://github.com/earendil-works/context-mode) | `ctx_doctor` | `ctx_search`, `ctx_execute`, `ctx_execute_file`, `ctx_stats` tools |
+| [pi-subagents](https://github.com/earendil-works/pi-subagents) | `subagent({ action: "doctor" })` | Agent lifecycle, `.pi/settings.json` overrides, `subagent()` orchestration |
+| Node.js ≥ 20 | `node --version` | `npx husky`, `npm install`, ESLint runtime |
+| git ≥ 2.30 | `git --version` | Pre-commit hooks, conventional commits |
+
+### Project (installed by this skill or must already exist)
+
+| Dependency | How it's handled |
+|---|---|
+| TypeScript ≥ 5 | Skill hardens `tsconfig.json`; expects existing install |
+| ESLint (flat config) | Skill merges standards into `eslint.config.js`; creates minimal config if missing |
+| Prettier | Skill adds format scripts; expects existing install or adds it |
+| `eslint-plugin-jsdoc` | Auto-installed by skill when creating `eslint.standards.config.js` |
+| `husky`, `lint-staged` | Installed by Phase 7 |
+
+### Quick environment check
+
+Run these before Phase 0. If any fail, fix the environment first:
+
+```bash
+# pi itself
+pi --version
+
+# context-mode
+ctx_doctor
+
+# pi-subagents
+subagent({ action: "doctor" })
+
+# runtime
+node --version  # ≥ 20
+git --version   # ≥ 2.30
+```
+
+Do NOT proceed past Phase 0 if any environment check fails — the harness
+will produce agent files that reference tools and APIs that don't exist.
+
 ## When to Use
 
 - New repo: user wants agent-driven development from day one
