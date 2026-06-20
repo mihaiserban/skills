@@ -116,23 +116,7 @@ The block:
 Then write the three docs files:
 
 - **`docs/agents/issue-tracker.md`** — use the seed template at `engineering/setup-skills/issue-tracker-github.md` as a starting point. Replace the PRs-as-request-surface flag with the user's answer. For local-markdown or other trackers, write from scratch using the user's description.
-- **`docs/agents/triage-labels.md`** — a mapping table of canonical role → actual label string. Template:
-
-```markdown
-# Triage Labels
-
-The skills speak in terms of five canonical triage roles. This file maps those roles to the actual label strings used in this repo's issue tracker.
-
-| Canonical role | Label in our tracker | Meaning |
-|---|---|---|
-| `needs-triage` | `needs-triage` | Maintainer needs to evaluate |
-| `needs-info` | `needs-info` | Waiting on reporter |
-| `ready-for-agent` | `ready-for-agent` | Fully specified, AFK-ready |
-| `ready-for-human` | `ready-for-human` | Requires human implementation |
-| `wontfix` | `wontfix` | Will not be actioned |
-
-When a skill mentions a role, use the corresponding label string from this table.
-```
+- **`docs/agents/triage-labels.md`** — use the seed template at `engineering/setup-skills/triage-labels.md` as a starting point. Replace the right-hand column with the user's actual label strings.
 
 - **`docs/agents/domain.md`** — use the seed template at `engineering/setup-skills/domain.md` as a starting point. Customize the file structure diagram to match the user's layout (single vs multi-context).
 
