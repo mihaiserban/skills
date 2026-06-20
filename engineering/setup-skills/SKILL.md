@@ -115,7 +115,7 @@ The block:
 
 Then write the three docs files:
 
-- **`docs/agents/issue-tracker.md`** — use the seed template at `engineering/gh-tracker/issue-tracker-github.md` as a starting point. Replace the PRs-as-request-surface flag with the user's answer. For local-markdown or other trackers, write from scratch using the user's description.
+- **`docs/agents/issue-tracker.md`** — use the seed template at `engineering/setup-skills/issue-tracker-github.md` as a starting point. Replace the PRs-as-request-surface flag with the user's answer. For local-markdown or other trackers, write from scratch using the user's description.
 - **`docs/agents/triage-labels.md`** — a mapping table of canonical role → actual label string. Template:
 
 ```markdown
@@ -134,7 +134,7 @@ The skills speak in terms of five canonical triage roles. This file maps those r
 When a skill mentions a role, use the corresponding label string from this table.
 ```
 
-- **`docs/agents/domain.md`** — use the seed template at `engineering/domain/domain.md` as a starting point. Customize the file structure diagram to match the user's layout (single vs multi-context).
+- **`docs/agents/domain.md`** — use the seed template at `engineering/setup-skills/domain.md` as a starting point. Customize the file structure diagram to match the user's layout (single vs multi-context).
 
 ### 5. Done
 
