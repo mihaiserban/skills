@@ -66,16 +66,13 @@ subagent({
   tasks: [
     {
       agent: "{{PACKAGE}}.reviewer",
-      task: "Review the current diff. Inspect changed files directly.",
+      task: "Review the current diff. Classify changes and inspect files directly.",
       output: false,
     },
-    {
-      agent: "{{PACKAGE}}.ts-standards-reviewer",
-      task: "Review the current diff for TS semantic standards.",
-      output: false,
-    },
+    // add a specialized reviewer (security/license) in parallel only for a
+    // genuinely-distinct high-stakes domain — not for TS standards, which the
+    // general reviewer's checklist already covers
   ],
-  concurrency: 2,
   context: "fresh",
   async: true,
 })
@@ -130,4 +127,4 @@ Do useful parallel work:
 | `eslint.standards.config.js` | Mechanical lint rules (no `any`, `!`, `as`, etc.) |
 | `.pi/agents/{{PACKAGE}}.worker.md` | Worker agent definition |
 | `.pi/agents/{{PACKAGE}}.reviewer.md` | Reviewer agent definition |
-| `.pi/agents/{{PACKAGE}}.ts-standards-reviewer.md` | TS standards reviewer |
+| `.pi/agents/{{PACKAGE}}.ts-standards-reviewer.md` | TS standards reviewer (optional) |

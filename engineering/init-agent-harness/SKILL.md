@@ -82,8 +82,8 @@ project-root/
 ├── .pi/
 │   ├── agents/
 │   │   ├── <package>.worker.md          # implementation worker
-│   │   ├── <package>.reviewer.md        # general reviewer
-│   │   └── <package>.ts-standards-reviewer.md  # TS semantic standards
+│   │   └── <package>.reviewer.md        # general reviewer (covers TS standards)
+│   │   # optional: <package>.ts-standards-reviewer.md, <package>.security-reviewer.md
 │   ├── SESSION_START.md                 # bootstraps every session
 │   └── skills/                          # (this skill lives here)
 ├── AGENTS.md                            # agent harness reference doc
@@ -120,6 +120,13 @@ Ask the user (or infer from codebase):
    - Scout, researcher (explorer tier): `deepseek/deepseek-v4-flash`
    - Oracle, planner: inherit pi default
 
+   **Calibration rule:** all reviewers that run in the same parallel fanout MUST
+   share one model — different models produce incomparable severity calibration.
+   Keep every reviewer on a single model; only the worker (code-specialized)
+   and scout/researcher (fast) tiers may differ. If you migrate providers,
+   migrate every reviewer at once, never half (a half-migrated fanout mixes
+   reasoning profiles on the same diff).
+
 If the user doesn't know, use sensible defaults: package=dir-name, framework=infer
 from package.json dependencies, TDD=yes, security=no, model=default.
 
@@ -135,13 +142,25 @@ them.
 |---|---|---|
 | `<package>.worker` | `templates/agents/worker.md` | ✅ |
 | `<package>.reviewer` | `templates/agents/reviewer.md` | ✅ |
-| `<package>.ts-standards-reviewer` | `templates/agents/ts-standards-reviewer.md` | ✅ |
 
 **Conditional:**
 
 | Agent | Template | When? |
 |---|---|---|
 | `<package>.security-reviewer` | Build from scratch | Only if user wants security review |
+| `<package>.ts-standards-reviewer` | `templates/agents/ts-standards-reviewer.md` | Optional — see reviewer discipline below |
+
+**Reviewer discipline.** Prefer ONE general reviewer with a classification
+step plus a domain checklist. The general reviewer's checklist already covers
+TypeScript standards, domain logic, tests, and config — do NOT add a separate
+reviewer for a domain it already enumerates. Add a specialized reviewer ONLY
+for a genuinely-distinct, high-stakes domain (security, licensing, compliance)
+where a skim-the-checklist pass is dangerous. Every specialized reviewer is a
+separate fresh-context subagent that re-reads the same diff and satellite docs;
+proliferation burns context for no added depth. The `ts-standards-reviewer`
+template is kept as an opt-in for large/strict-standards codebases that warrant
+a dedicated semantic pass — by default its high-value angles are folded into
+the general reviewer's checklist.
 
 For the security reviewer, adapt the review angles to the framework:
 - Electron → process isolation, IPC, contextBridge
@@ -169,7 +188,6 @@ for every agent. Use the full runtime name (`<package>.<name>`) as the key:
     "agentOverrides": {
       "<package>.worker": { "model": "<coding-model>" },
       "<package>.reviewer": { "model": "<coding-model>" },
-      "<package>.ts-standards-reviewer": { "model": "<coding-model>" },
       "scout": { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
       "researcher": { "model": "deepseek/deepseek-v4-flash", "thinking": "off" }
     }
@@ -178,8 +196,10 @@ for every agent. Use the full runtime name (`<package>.<name>`) as the key:
 ```
 
 If `.pi/settings.json` already exists, merge into the existing `agentOverrides`
-object — do not replace other settings. For the security reviewer (if created),
-add its override too.
+object — do not replace other settings. For any optional reviewer created
+(security-reviewer, ts-standards-reviewer), add its override too — and keep it
+on the same model as the general reviewer so fanout calibration stays
+comparable.
 
 ### Phase 2: Create AGENTS.md
 
@@ -343,15 +363,57 @@ git add -A
 git commit -m "chore: initialize agent harness with coding standards, lint gates, and agents"
 ```
 
+### Phase 12: Codegraph Integration (optional)
+
+Wire [codegraph](https://github.com/colbymchenry/codegraph) as a semantic code
+graph the subagents can query instead of grep/glob/Read. Skip this for small
+codebases the team holds in their head — it only pays off when recon burns
+real context.
+
+1. Install the codegraph CLI and build the index:
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh
+   codegraph init
+   ```
+   Ensure the install dir (`~/.local/bin` by default) is on PATH.
+
+2. Install the pi extension that bridges codegraph as an MCP sidecar and
+   injects a "use codegraph first" note into the parent system prompt:
+   ```bash
+   pi install npm:@viniraioli/pi-codegraph
+   ```
+
+3. Make codegraph visible to subagents. The extension only registers
+   `codegraph_*` tools on the parent orchestrator; subagents
+   (`systemPromptMode: replace`, `inheritProjectContext: false`) never inherit
+   them. Append the codegraph tool set to the `tools:` line of `worker.md` and
+   `reviewer.md` (and `oracle.md` if present):
+   ```
+   , codegraph_explore, codegraph_search, codegraph_node, codegraph_callers, codegraph_callees, codegraph_impact
+   ```
+   And add a one-line prompt note to each: "For structural questions (callers,
+   blast radius, call paths) prefer `codegraph_explore` / `codegraph_callers` /
+   `codegraph_impact` over file reads; use `ctx_search` for text recall."
+
+4. `codegraph init` writes its own `.codegraph/.gitignore` (ignores everything
+   but itself), so the SQLite index stays machine-local — no further action.
+
+5. Restart pi in the project — the extension and tools load at startup, not
+   mid-session.
+
 ## Customization Points
 
 After running this skill, the user (or a follow-up session) should:
 
 1. **Fill CODE_STANDARDS.md §2** if framework is `other` — add framework-specific
    patterns
-2. **Add more agents** — tool-contract-reviewer, license-reviewer,
-   design-reviewer as the project grows. When adding agents, do NOT put `model:`
-   in their frontmatter — add their override to `.pi/settings.json` instead.
+2. **Add more agents** — but only for genuinely-distinct high-stakes domains
+   (security-reviewer, license-reviewer). Do NOT add a reviewer for a domain
+   the general reviewer's checklist already covers (type-safety, tool-contract,
+   ts-standards) — that duplicates a fresh-context subagent for no added depth.
+   When adding agents, do NOT put `model:` in their frontmatter — add their
+   override to `.pi/settings.json` instead, and keep every reviewer on the
+   same model so fanout severity calibration stays comparable.
 3. **Create DESIGN_SYSTEM.md** if the project has a UI
 4. **Create acceptance contracts** in `acceptance/` if using task-group workflow
 5. **Create MANIFEST.md** if using phased implementation
@@ -366,3 +428,10 @@ After running this skill, the user (or a follow-up session) should:
 - ❌ Don't create tool-contract-reviewers unless the project has a ToolDescriptor pattern
 - ❌ Don't skip the user prompts in Phase 0 — framework choice matters
 - ❌ Don't overwrite existing agent files — this is init-only, not repair
+- ❌ Don't create a bootstrap "knowledge" doc (e.g., `AGENT_KNOWLEDGE.md`)
+  that duplicates `AGENTS.md` + the satellite docs. Agent files already point
+  at the real docs; a second index drifts stale and misleads workers.
+- ❌ Don't proliferate specialized reviewers for domains the general reviewer's
+  checklist already covers. Each is a fresh-context subagent re-reading the same
+  diff. Add a specialized reviewer only for a genuinely-distinct high-stakes
+  domain (security, licensing, compliance).

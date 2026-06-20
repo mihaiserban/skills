@@ -42,12 +42,17 @@ Before reviewing, classify the diff into one or more of:
 ### TypeScript Standards
 - No `any`, no `!`, no `as` casts (mechanical — already enforced by lint; flag
   only if lint is bypassed)
-- Errors are typed, never thrown for expected conditions
-- Parse, don't validate: untrusted input parsed at boundaries
-- Branded types for meaningful primitives (IDs, EmailAddress, etc.)
-- Exhaustive switches on discriminated unions
-- Import order: builtins → external → internal → relative
-- No circular imports
+- Errors are VALUES in the return type, not thrown for expected conditions;
+  defects use prelude helpers (`casesHandled` / `shouldNeverHappen`), not ad-hoc throws
+- Parse, don't validate: untrusted input parsed to branded types at the earliest boundary
+- Branded types for meaningful primitives (IDs, `EmailAddress`, `Cents`, `Milliseconds`)
+- Exhaustive switches on discriminated unions; lifecycle states as tagged unions, not boolean flags
+- Functional core / imperative shell: side effects (I/O, network, clock) at the edges, not in pure logic
+- Mutating workflows are idempotent (safe to retry)
+- Production code exposes test seams; flag code that FORCES mocks
+- Secrets/PII never in logs/errors; sensitive fields `Redacted`
+- Import order: builtins → external → internal → relative; no circular imports
+- See `CODE_STANDARDS.md` for the full semantic checklist — this is the high-value subset
 
 ### Domain Logic
 - Business rules are explicit and testable

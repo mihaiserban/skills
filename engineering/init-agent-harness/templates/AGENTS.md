@@ -10,10 +10,12 @@ project-specific agents, and the orchestration patterns they compose into.
 | Agent | Role | Context | Writes? | Use When |
 |---|---|---|---|---|
 | `{{PACKAGE}}.worker` | Implementation | fork | yes | Building ANY code |
-| `{{PACKAGE}}.reviewer` | General review | fresh | no | Mixed-domain diffs |
-| `{{PACKAGE}}.ts-standards-reviewer` | TS Coding Standards | fresh | no | Semantic standards: errors, parsing, branding, modules, workflows, tests, config |
+| `{{PACKAGE}}.reviewer` | General review | fresh | no | Default reviewer — TS standards, domain logic, tests, config |
 {{SECURITY_ROW}}
 | `worker` (builtin) | Generic implementation | fork | yes | Simple tasks, file ops |
+
+<!-- Optional reviewers (ts-standards, tool-contract, etc.) are added ONLY for
+     genuinely-distinct high-stakes domains — see SKILL.md reviewer discipline. -->
 | `reviewer` (builtin) | Generic review | fresh | no | Non-project-specific review |
 | `oracle` (builtin) | Decision advisory | fork | no | Architecture, drift, tradeoffs |
 | `scout` (builtin) | Codebase recon | fresh | no | Exploring, mapping modules |
@@ -52,8 +54,10 @@ subagent({
 auto-classifies changes and applies the right checks.
 
 **What it checks**: classifies the diff by file pattern, then applies the
-relevant review angle (TypeScript Standards, Domain Logic, Tests,
-Config/Build).
+relevant review angle — TypeScript standards (mechanical + semantic: error
+modeling, parse-don't-validate, branded types, functional-core/imperative-shell,
+workflow idempotency, test seams, sensitive data), domain logic, tests, and
+config/build.
 
 **Invocation** (parallel review):
 
@@ -67,30 +71,6 @@ subagent({
 ```
 
 ---
-
-### {{PACKAGE}}.ts-standards-reviewer
-
-**When**: any diff touching domain/application code where the *semantic*
-TypeScript Coding Standards apply — error modeling, parse-don't-validate,
-branded types, state machines, module depth, adapter reuse audits,
-functional-core/imperative-shell, workflow idempotency, test seams,
-sensitive-data handling, config parsing, JSDoc/SAFETY-comment quality.
-
-**What it checks**: only the SEMANTIC standards. The MECHANICAL rules (`any`,
-`!`, `as` casts, `vi.mock`, `process.env`, `export *`, `assertNever`, missing
-JSDoc) are already enforced by `eslint.standards.config.js` + `tsconfig.json` —
-this reviewer does NOT re-report them.
-
-**Invocation**:
-
-```ts
-subagent({
-  agent: "{{PACKAGE}}.ts-standards-reviewer",
-  task: "Review the current diff for TypeScript Coding Standards adherence (semantic rules).",
-  context: "fresh",
-  async: true,
-})
-```
 
 {{SECURITY_AGENT_SECTION}}
 
@@ -157,12 +137,14 @@ SESSION B (REVIEW)
 ### 2. Parallel Review Fanout
 
 ```ts
+// Default: one general reviewer classifies and covers all angles (TS
+// standards, domain logic, tests, config). Add a specialized reviewer in
+// parallel ONLY for a genuinely-distinct high-stakes domain (security,
+// licensing) — never for a domain the general reviewer already covers.
 subagent({
   tasks: [
-    { agent: "{{PACKAGE}}.reviewer", task: "Review the current diff." },
-    { agent: "{{PACKAGE}}.ts-standards-reviewer", task: "Review for TS semantic standards." },
+    { agent: "{{PACKAGE}}.reviewer", task: "Review the current diff. Classify changes and apply relevant checks." },
   ],
-  concurrency: 2,
   context: "fresh",
   async: true,
 })
@@ -274,6 +256,19 @@ Anti-patterns:
 - Narrative ("I then read...") — never
 - Vague ("some issues exist") — be specific or omit
 - Full file contents — use file-only
+
+## Model Routing Strategy
+
+Models live in `.pi/settings.json` `subagents.agentOverrides` (not in agent
+frontmatter), so swapping a tier's model is a one-line edit. Cognitive tiers:
+
+- **Orchestrator (parent pi), planner** → inherit the Pi default
+- **Worker + reviewers + oracle** → one strong-reasoning model (coding tier)
+- **Scout, researcher** → fast model with `thinking: off` (explorer tier)
+
+**Calibration rule:** every reviewer that runs in the same parallel fanout MUST
+share one model. Different models produce incomparable severity calibration —
+migrate all reviewers together, never half. See [Context Hygiene](#context-hygiene).
 
 ## Troubleshooting
 

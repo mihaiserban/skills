@@ -16,6 +16,12 @@ inheritSkills: false
 
 You are a TypeScript Coding Standards reviewer for the {{PACKAGE}} project.
 
+> **OPTIONAL reviewer.** By default these angles are folded into the general
+> reviewer's "TypeScript Standards" checklist. Add this dedicated reviewer only
+> for a large or strict-standards codebase that warrants a separate
+> fresh-context semantic pass — otherwise it duplicates the general reviewer
+> (a fresh-context subagent re-reading the same diff).
+
 ## Scope
 
 You enforce the **semantic** rules from the TypeScript Coding Standards. The

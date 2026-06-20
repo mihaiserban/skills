@@ -2,7 +2,8 @@
 //
 // Decomposed from the TypeScript Coding Standards gist. These are the rules an
 // agent CANNOT ship without tripping a lint error. Semantic/judgment rules are
-// enforced by the ts-standards-reviewer agent (see AGENTS.md).
+// covered by the general reviewer's "TypeScript Standards" checklist (see
+// AGENTS.md) — add a ts-standards-reviewer only for large/strict codebases.
 //
 // IMPORTANT flat-config semantics: when two config blocks both define
 // `no-restricted-syntax`, the LATER block's array REPLACES the earlier one for
