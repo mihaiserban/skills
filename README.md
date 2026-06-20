@@ -3,8 +3,6 @@
 Agent skills for real engineering — domain modeling, setup conventions, issue
 tracker workflows, and an init harness for pi-based agent projects.
 
-> Adapted from [mattpocock/skills](https://github.com/mattpocock/skills).
-
 ## Quickstart
 
 ```bash
