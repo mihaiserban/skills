@@ -20,7 +20,12 @@ echo ""
 is_pi()     { command -v pi >/dev/null 2>&1 || [ -d "$HOME/.agents" ]; }
 is_claude() { command -v claude >/dev/null 2>&1; }
 is_opencode(){ command -v opencode >/dev/null 2>&1; }
-is_codex()  { command -v codex >/dev/null 2>&1; }
+is_codex()  {
+  command -v codex >/dev/null 2>&1 ||
+    [ -d "$HOME/.codex/skills" ] ||
+    [ -d "/Applications/Codex.app" ] ||
+    [ -d "$HOME/Applications/Codex.app" ]
+}
 
 ensure_submodules() {
   if [ -f "$REPO_ROOT/.gitmodules" ]; then
