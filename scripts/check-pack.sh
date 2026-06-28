@@ -16,6 +16,13 @@ published_prefix() {
   esac
 }
 
+included_prefix() {
+  case "$1" in
+    design/*|engineering/*|research|research/*|vendor/ponytail/skills/*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 manifest_file=".claude-plugin/plugin.json"
 [ -f "$manifest_file" ] || fail "missing $manifest_file"
 
@@ -27,6 +34,18 @@ done < <(
     | sed 's#/SKILL.md$##' \
     | sort
 )
+
+included_skills=("${published_skills[@]}")
+if [ -d vendor/ponytail/skills ]; then
+  while IFS= read -r line; do
+    included_skills+=("$line")
+  done < <(
+    find vendor/ponytail/skills -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
+      | sed 's#/SKILL.md$##' \
+      | sort
+  )
+fi
+included_skills=($(printf "%s\n" "${included_skills[@]}" | sort))
 
 manifest_skills=()
 while IFS= read -r line; do
@@ -42,15 +61,15 @@ for entry in sorted(item.removeprefix("./") for item in manifest.get("skills", [
 PY
 )
 
-if [ "${published_skills[*]}" != "${manifest_skills[*]}" ]; then
-  echo "Published skills and manifest entries differ." >&2
-  comm -23 <(printf "%s\n" "${published_skills[@]}") <(printf "%s\n" "${manifest_skills[@]}") | sed 's/^/missing from manifest: /' >&2
-  comm -13 <(printf "%s\n" "${published_skills[@]}") <(printf "%s\n" "${manifest_skills[@]}") | sed 's/^/extra in manifest: /' >&2
+if [ "${included_skills[*]}" != "${manifest_skills[*]}" ]; then
+  echo "Included skills and manifest entries differ." >&2
+  comm -23 <(printf "%s\n" "${included_skills[@]}") <(printf "%s\n" "${manifest_skills[@]}") | sed 's/^/missing from manifest: /' >&2
+  comm -13 <(printf "%s\n" "${included_skills[@]}") <(printf "%s\n" "${manifest_skills[@]}") | sed 's/^/extra in manifest: /' >&2
   exit 1
 fi
 
 for skill in "${manifest_skills[@]}"; do
-  published_prefix "$skill" || fail "manifest includes non-published skill: $skill"
+  included_prefix "$skill" || fail "manifest includes unsupported skill: $skill"
   [ -f "$skill/SKILL.md" ] || fail "manifest entry has no SKILL.md: $skill"
 done
 
@@ -108,4 +127,4 @@ rg -n "init-agent-harness|\\.agents/skills/design-md-style|design-md-style-(pick
   --glob '!scripts/check-pack.sh' \
   . && fail "stale references found"
 
-echo "Pack check passed: ${#published_skills[@]} published skill(s)."
+echo "Pack check passed: ${#published_skills[@]} published skill(s), ${#manifest_skills[@]} manifest skill(s)."

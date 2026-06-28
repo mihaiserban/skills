@@ -8,6 +8,12 @@
     "./engineering/domain-modeling",
     "./engineering/frontend-design",
     "./engineering/setup-skills",
-    "./research"
+    "./research",
+    "./vendor/ponytail/skills/ponytail-audit",
+    "./vendor/ponytail/skills/ponytail-debt",
+    "./vendor/ponytail/skills/ponytail-gain",
+    "./vendor/ponytail/skills/ponytail-help",
+    "./vendor/ponytail/skills/ponytail-review",
+    "./vendor/ponytail/skills/ponytail"
   ]
 }

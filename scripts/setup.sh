@@ -22,6 +22,14 @@ is_claude() { command -v claude >/dev/null 2>&1; }
 is_opencode(){ command -v opencode >/dev/null 2>&1; }
 is_codex()  { command -v codex >/dev/null 2>&1; }
 
+ensure_submodules() {
+  if [ -f "$REPO_ROOT/.gitmodules" ]; then
+    echo -e "${CYAN}Ensuring vendored skill packs...${NC}"
+    git -C "$REPO_ROOT" submodule update --init --recursive
+    echo ""
+  fi
+}
+
 link_harness() {
   local label="$1" parent="$2" name="$3" harness_id="$4"
   local target="${parent}/${name}"
@@ -49,6 +57,10 @@ link_harness() {
   echo -e " ${GREEN}✓${NC}  $label → $target"
   return 0
 }
+
+# ── Phase 0: Submodules ──────────────────────────────────────────────
+
+ensure_submodules
 
 # ── Phase 1: Symlink ─────────────────────────────────────────────────
 
@@ -100,6 +112,19 @@ done < <(
     -not -path "*/.git/*" \
     -print0 2>/dev/null | sort -z
 )
+
+if [ -d "$REPO_ROOT/vendor/ponytail/skills" ]; then
+  while IFS= read -r -d '' skill_md; do
+    skill_dir="$(dirname "$skill_md")"
+    rel="${skill_dir#$REPO_ROOT/}"
+    SKILL_DIRS+=("$rel")
+  done < <(
+    find "$REPO_ROOT/vendor/ponytail/skills" \
+      -name "SKILL.md" \
+      -not -path "*/.git/*" \
+      -print0 2>/dev/null | sort -z
+  )
+fi
 
 if [ ${#SKILL_DIRS[@]} -eq 0 ]; then
   echo -e " ${YELLOW}⚠${NC}  No SKILL.md files found — skipping plugin.json"

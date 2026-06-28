@@ -60,3 +60,4 @@ fi
 
 echo ""
 echo -e "${GREEN}Done.${NC}"
+echo "Vendored submodules are left in place. Remove them with git if you want to change the repository layout."
