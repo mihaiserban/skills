@@ -94,7 +94,12 @@ while IFS= read -r -d '' skill_md; do
   skill_dir="$(dirname "$skill_md")"
   rel="${skill_dir#$REPO_ROOT/}"
   SKILL_DIRS+=("$rel")
-done < <(find "$REPO_ROOT" -name "SKILL.md" -not -path "*/.git/*" -print0 | sort -z)
+done < <(
+  find "$REPO_ROOT/design" "$REPO_ROOT/engineering" "$REPO_ROOT/research" \
+    -name "SKILL.md" \
+    -not -path "*/.git/*" \
+    -print0 2>/dev/null | sort -z
+)
 
 if [ ${#SKILL_DIRS[@]} -eq 0 ]; then
   echo -e " ${YELLOW}⚠${NC}  No SKILL.md files found — skipping plugin.json"

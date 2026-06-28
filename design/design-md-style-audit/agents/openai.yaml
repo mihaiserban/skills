@@ -1,0 +1,4 @@
+interface:
+  display_name: "DESIGN.md Style Audit"
+  short_description: "Check UI against a source DESIGN.md"
+  default_prompt: "Use $design-md-style-audit to review whether this UI matches its source DESIGN.md aesthetic."

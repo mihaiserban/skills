@@ -1,0 +1,4 @@
+interface:
+  display_name: "DESIGN.md Style Picker"
+  short_description: "Choose a source aesthetic from DESIGN.md"
+  default_prompt: "Use $design-md-style-picker to choose a strong source aesthetic for this product brief."

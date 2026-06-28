@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research"
+  short_description: "Research arXiv when requested"
+  default_prompt: "Use $research to survey relevant arXiv literature for this topic."

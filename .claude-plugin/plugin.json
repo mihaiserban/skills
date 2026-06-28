@@ -1,0 +1,13 @@
+{
+  "name": "mihaiserban-skills",
+  "skills": [
+    "./design/design-md-style-apply",
+    "./design/design-md-style-audit",
+    "./design/design-md-style-picker",
+    "./design/design-taste-distiller",
+    "./engineering/domain-modeling",
+    "./engineering/frontend-design",
+    "./engineering/setup-skills",
+    "./research"
+  ]
+}

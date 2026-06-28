@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Taste Distiller"
+  short_description: "Distill references into agent taste"
+  default_prompt: "Use $design-taste-distiller to turn these references into a compact TASTE.md for future design agents."
