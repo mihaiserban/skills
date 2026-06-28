@@ -1,6 +1,6 @@
 ---
 name: design-taste-distiller
-description: Distill visual taste from references, screenshots, prior designs, notes, DESIGN.md files, brand examples, or user preferences into a compact TASTE.md for future design agents. Use when the user asks how to capture taste, create taste guidelines, make agents design with better judgment, define aesthetic preferences, avoid generic AI design, or build a reusable design judgment layer alongside DESIGN.md.
+description: Distill visual taste from references, screenshots, prior designs, notes, DESIGN.md files, brand examples, workflow preferences, or user feedback into a compact TASTE.md for future design agents. Use when the user asks how to capture taste, create taste guidelines, make agents design with better judgment, define aesthetic preferences, avoid generic AI design, capture critique loops, or build a reusable design judgment layer alongside DESIGN.md.
 ---
 
 # Design Taste Distiller
@@ -18,6 +18,7 @@ Accept any mix of:
 - existing `DESIGN.md` files
 - prior project notes
 - user comments like "this feels too generic" or "more like Linear but warmer"
+- workflow preferences such as "audit before rebuilding", "show variants first", or "use the design-system skill when applying a known style"
 - folders of markdown, images, or product artifacts
 
 If inputs are files, inspect them directly. If the reference set is text-heavy, use:
@@ -52,8 +53,15 @@ The scaffold is only a starting point. Fill it with real judgment from the refer
    - questions the agent must ask before building
    - questions the agent must ask after seeing screenshots
    - what to remove when the design feels generic
+   - which mode the agent is in: explore, build, audit, refine, or ship
 
-5. Keep it compact:
+5. Capture reusable playbooks:
+   - which skills, design-system docs, style guides, or TASTE.md/DESIGN.md files to load for each mode
+   - what to load first by default, and what to load only when the task needs it
+   - when to use screenshots, visual audits, or side-by-side comparisons before changing code
+   - when to stop adding new visual ideas and instead refine spacing, hierarchy, copy, responsiveness, and states
+
+6. Keep it compact:
    - target 1 to 3 pages
    - use bullets and short imperatives
    - include concrete positive and negative examples
@@ -78,8 +86,14 @@ Use this structure unless the project already has a taste document:
 
 ## Critique Questions
 
+## Workflow Modes
+
+## Playbooks To Load
+
 ## Memory
 ```
+
+Use `Workflow Modes` to encode how design work should proceed, such as explore, build, audit, refine, or ship. Use `Playbooks To Load` to name the reusable skills or documents a future agent should reach for, without loading everything for every task.
 
 ## Quality Bar
 
@@ -88,6 +102,7 @@ Use this structure unless the project already has a taste document:
 - Name tradeoffs. For example: "Prefer density for expert tools, but never at the cost of scan order."
 - Avoid copying a famous brand's identity. Capture judgment and posture, not trademarked expression.
 - Preserve user voice. If the user has strong phrasing, include it directly in short quotes.
+- Make the workflow opinionated. Good taste often comes from critique loops and mode-specific playbooks, not a single generation pass.
 
 ## Using With DESIGN.md
 
