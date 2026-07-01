@@ -9,6 +9,7 @@ Use this to compare an implementation against a selected source `DESIGN.md`.
 - Is the source's signature element present in a product-specific form?
 - Are repeated controls consistent across states and breakpoints?
 - Does the design still serve the user's product rather than performing the source brand?
+- Are accent, radius, type, theme, CTA language, and asset strategy locked consistently?
 
 ## Common Drift Patterns
 
@@ -19,6 +20,9 @@ Use this to compare an implementation against a selected source `DESIGN.md`.
 - Wrong media strategy: a photography-first source gets icon cards, or a data-first source gets decorative images.
 - Uncontrolled gradients: gradients appear where the source relies on solid surfaces, photography, or typography.
 - Weak signature: the most memorable source move is absent or copied literally instead of translated.
+- Default structure: centered hero, repeated cards, section eyebrows, or zigzags appear because no stronger layout decision was made.
+- Missing states: the UI only shows the happy path and lacks loading, empty, error, focus, or active states.
+- Asset gap: a media-led style is implemented with empty boxes, fake screenshots, or text-only placeholders.
 
 ## Fix Patterns
 
@@ -27,3 +31,5 @@ Use this to compare an implementation against a selected source `DESIGN.md`.
 - Collapse decorative cards into stronger sections when the source uses full-bleed bands or editorial layouts.
 - Add one source-faithful signature element, then remove weaker decorations.
 - Audit mobile separately; many style systems fail when type and controls compress.
+- Add or simplify states until the UI feels usable, not just presentational.
+- Replace default section patterns with layout families justified by the content.

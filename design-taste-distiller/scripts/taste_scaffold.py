@@ -78,6 +78,21 @@ def build_scaffold(files: list[Path], max_chars: int) -> str:
 - Spend visual drama on one memorable element; keep surrounding UI disciplined.
 - If the design feels generic, remove weak decoration before adding new effects.
 
+## Execution Dials
+
+- Layout variance: /10
+- Motion intensity: /10
+- Visual density: /10
+
+## Design Locks
+
+- Accent:
+- Shape:
+- Type:
+- Theme:
+- CTA language:
+- Asset strategy:
+
 ## Critique Questions
 
 - What is the visual thesis?
@@ -85,6 +100,29 @@ def build_scaffold(files: list[Path], max_chars: int) -> str:
 - Could this belong to ten other products?
 - Is typography, spacing, or imagery carrying the personality?
 - What did we remove?
+
+## Preflight Checks
+
+- Hero or primary workspace fits its viewport and has one clear job.
+- Accent, radius, type, and CTA language are consistent.
+- Repeated sections do not reuse the same layout family without purpose.
+- Buttons, forms, focus rings, and media overlays pass contrast checks.
+- Mobile layout is explicitly handled for every multi-column section.
+- Empty, loading, error, and active states exist where the product needs them.
+
+## Workflow Modes
+
+- Explore:
+- Build:
+- Audit:
+- Refine:
+- Ship:
+
+## Playbooks To Load
+
+- Selection:
+- Implementation:
+- Audit:
 
 ## Memory
 

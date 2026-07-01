@@ -24,7 +24,7 @@ Accept any mix of:
 If inputs are files, inspect them directly. If the reference set is text-heavy, use:
 
 ```bash
-python3 /Users/mitzuuuu/.agents/skills/design/design-taste-distiller/scripts/taste_scaffold.py --output TASTE.md <paths...>
+python3 /Users/mitzuuuu/.agents/skills/design-taste-distiller/scripts/taste_scaffold.py --output TASTE.md <paths...>
 ```
 
 The scaffold is only a starting point. Fill it with real judgment from the references.
@@ -49,19 +49,25 @@ The scaffold is only a starting point. Fill it with real judgment from the refer
    - "Let typography carry personality before adding decorative effects."
    - "Make premium mean control, spacing, and material confidence, not generic dark gloss."
 
-4. Add a critique loop:
+4. Add execution controls:
+   - a one-line `Design Read` pattern for future agents to state before building
+   - `Execution Dials` for variance, motion, and density
+   - `Design Locks` for accent color, radius system, type system, theme, and CTA language
+   - `Preflight Checks` that must pass before shipping
+
+5. Add a critique loop:
    - questions the agent must ask before building
    - questions the agent must ask after seeing screenshots
    - what to remove when the design feels generic
    - which mode the agent is in: explore, build, audit, refine, or ship
 
-5. Capture reusable playbooks:
+6. Capture reusable playbooks:
    - which skills, design-system docs, style guides, or TASTE.md/DESIGN.md files to load for each mode
    - what to load first by default, and what to load only when the task needs it
    - when to use screenshots, visual audits, or side-by-side comparisons before changing code
    - when to stop adding new visual ideas and instead refine spacing, hierarchy, copy, responsiveness, and states
 
-6. Keep it compact:
+7. Keep it compact:
    - target 1 to 3 pages
    - use bullets and short imperatives
    - include concrete positive and negative examples
@@ -84,7 +90,13 @@ Use this structure unless the project already has a taste document:
 
 ## Decision Rules
 
+## Execution Dials
+
+## Design Locks
+
 ## Critique Questions
+
+## Preflight Checks
 
 ## Workflow Modes
 
@@ -103,6 +115,7 @@ Use `Workflow Modes` to encode how design work should proceed, such as explore, 
 - Avoid copying a famous brand's identity. Capture judgment and posture, not trademarked expression.
 - Preserve user voice. If the user has strong phrasing, include it directly in short quotes.
 - Make the workflow opinionated. Good taste often comes from critique loops and mode-specific playbooks, not a single generation pass.
+- Make the checks mechanical where possible. "One accent color per page" is easier to enforce than "make it tasteful."
 
 ## Using With DESIGN.md
 

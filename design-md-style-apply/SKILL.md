@@ -19,7 +19,7 @@ python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py search "line
 python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py path linear.app
 ```
 
-Load only the selected source file plus `references/translation-workflow.md`. Also load the project `TASTE.md` if present. Do not load the entire catalog unless selection is still unresolved.
+Load only the selected source file plus `references/translation-workflow.md` and `references/execution-discipline.md`. Also load the project `TASTE.md` if present. Do not load the entire catalog unless selection is still unresolved.
 
 ## Translation Workflow
 
@@ -31,29 +31,37 @@ Load only the selected source file plus `references/translation-workflow.md`. Al
    - layout rhythm, media strategy, and signature element
    - explicit do/don't constraints
 
-2. Map the DNA to the user's product:
+2. Establish execution discipline:
+   - write a one-line design read
+   - infer layout variance, motion intensity, and visual density
+   - lock accent, shape, type, theme, CTA language, and asset strategy
+   - identify anti-default patterns that would weaken this brief
+
+3. Map the DNA to the user's product:
    - replace source-specific content with real product concepts
    - adapt the signature element to the product's workflow
    - keep semantics intact, such as primary actions, warnings, code/data surfaces, or media moments
    - remove source brand marks, logos, slogans, proprietary product names, and exact hero copy
    - use `TASTE.md` to decide where to spend visual drama and what anti-patterns to avoid
 
-3. Implement through the repo's existing patterns:
+4. Implement through the repo's existing patterns:
    - use existing framework, component structure, design tokens, icon library, routing, and state conventions
    - introduce CSS variables or token objects when the repo already uses tokens or the change spans multiple components
    - keep the edit scope tight unless a shared token layer is clearly needed
 
-4. Verify visually:
+5. Verify visually:
    - run the app when possible
    - inspect desktop and mobile screenshots
    - check that the source's strongest constraints are visible in the implemented UI
    - fix text overflow, contrast, focus states, and responsive layout problems before finishing
+   - run the preflight checks in `references/execution-discipline.md`
 
 ## Guardrails
 
 - Do not produce a brand clone. Translate aesthetics, not identity.
 - Do not mix multiple famous styles unless the user asks. A muddled hybrid usually feels less designed than a single strong source.
 - Do not treat color alone as style. A successful translation also carries typography, spacing, density, component geometry, and interaction behavior.
+- Do not ship generic default structure when the source style demands a stronger layout. Centered hero plus three cards is a fallback, not a design concept.
 - Do not paste large chunks of `DESIGN.md` into the final answer. Summarize the applied decisions and point to the source path.
 - Respect the product's domain. If a source style's hero-first marketing structure conflicts with a dense tool workflow, preserve its tokens and interaction grammar while designing the workspace first.
 - When `TASTE.md` and `DESIGN.md` conflict, follow explicit user instructions first, then `TASTE.md` judgment, then source `DESIGN.md` details.

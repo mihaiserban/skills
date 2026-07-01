@@ -19,7 +19,7 @@ python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py path runwaym
 python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py show runwayml --lines 160
 ```
 
-Read the selected source file and `references/audit-rubric.md`. Also read `TASTE.md` if present. Inspect the implemented UI through code, screenshots, or a running app. For frontend work, use screenshots whenever possible because design drift often hides in spacing, density, and rhythm.
+Read the selected source file, `references/audit-rubric.md`, and `references/preflight-rubric.md`. Also read `TASTE.md` if present. Inspect the implemented UI through code, screenshots, or a running app. For frontend work, use screenshots whenever possible because design drift often hides in spacing, density, and rhythm.
 
 ## Audit Pass
 
@@ -28,6 +28,7 @@ Score the UI on five dimensions:
 - Source DNA: palette, type, surfaces, geometry, and signature element feel like the selected source.
 - Taste fit: the UI follows the project's values, anti-patterns, and critique questions.
 - Product translation: the style supports the product's actual workflow rather than copying irrelevant source content.
+- Execution discipline: design locks, layout rules, component states, and preflight checks hold.
 - Consistency: repeated components share the same tokens, radii, borders, shadows, and interaction states.
 - Responsiveness: mobile and desktop preserve the intended hierarchy without overlap or overflow.
 - Accessibility: contrast, focus, labels, reduced motion, and touch targets are acceptable.
@@ -46,6 +47,7 @@ Selected source: <slug or path>
 Taste source: <TASTE.md path, or none>
 Fit: <strong / mixed / weak>
 Most important missing move: <one sentence>
+Preflight: <pass / partial / fail>
 ```
 
 Use priorities:

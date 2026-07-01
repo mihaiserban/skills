@@ -16,11 +16,13 @@ Use this when a product brief could fit multiple DESIGN.md profiles.
 
 ## Decision Heuristics
 
+- Start with a one-line read: page or app kind, audience, visual language, and implementation posture.
 - If the product is a working tool, prefer workflow density over spectacle.
 - If the product sells a physical object, prefer image strategy and spatial drama.
 - If the product sells trust, prefer disciplined palette, stable typography, and conservative motion.
 - If the product sells creativity, prefer media systems, expressive layout, and one memorable interaction.
 - If the user asks for "premium," decide whether premium means sparse luxury, technical precision, editorial confidence, or consumer polish before choosing.
+- Infer three dials before choosing: layout variance, motion intensity, and visual density. Pick a source whose natural posture matches those dials.
 
 ## Red Flags
 
@@ -28,3 +30,4 @@ Use this when a product brief could fit multiple DESIGN.md profiles.
 - A marketing-first source chosen for a data-heavy workspace.
 - A famous brand style chosen when the product needs a quieter category convention.
 - Two or more styles mixed before one clear source has been explored deeply.
+- A visually exciting source chosen even though its motion, density, or asset demands cannot be executed in the current product.
