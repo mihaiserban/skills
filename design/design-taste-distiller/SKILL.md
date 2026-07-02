@@ -24,7 +24,7 @@ Accept any mix of:
 If inputs are files, inspect them directly. If the reference set is text-heavy, use:
 
 ```bash
-python3 /Users/mitzuuuu/.agents/skills/design-taste-distiller/scripts/taste_scaffold.py --output TASTE.md <paths...>
+python3 /Users/mitzuuuu/.agents/skills/design/design-taste-distiller/scripts/taste_scaffold.py --output TASTE.md <paths...>
 ```
 
 The scaffold is only a starting point. Fill it with real judgment from the references.
