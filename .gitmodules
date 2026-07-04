@@ -4,6 +4,3 @@
 [submodule "vendor/awesome-design-md"]
 	path = vendor/awesome-design-md
 	url = https://github.com/voltagent/awesome-design-md.git
-[submodule "vendor/content-skills"]
-	path = vendor/content-skills
-	url = https://github.com/vyralcontent/content-skills

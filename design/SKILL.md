@@ -49,3 +49,5 @@ or user feedback into a reusable `TASTE.md` for future design work.
   to the user.
 - Check for an existing TASTE.md before running the picker — taste
   preferences override DESIGN.md defaults.
+
+Log pipeline results to `~/.design-log.md` with date, DESIGN.md source, and audit outcome for comparison across iterations.
