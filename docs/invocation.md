@@ -52,9 +52,9 @@ User-invoked:
 
 Model-invoked:
 
+- `/design` (root orchestrator)
 - `/design-md-style-apply`
 - `/design-md-style-audit`
 - `/design-md-style-picker`
 - `/design-taste-distiller`
 - `/domain-modeling`
-- `/frontend-design`

@@ -11,14 +11,14 @@ fail() {
 
 published_prefix() {
   case "$1" in
-    design/*|engineering/*|research|research/*) return 0 ;;
+    design|design/*|engineering/*|research|research/*) return 0 ;;
     *) return 1 ;;
   esac
 }
 
 included_prefix() {
   case "$1" in
-    design/*|engineering/*|research|research/*|vendor/ponytail/skills/*) return 0 ;;
+    design|design/*|engineering/*|research|research/*|vendor/*/skill*/*) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -36,15 +36,16 @@ done < <(
 )
 
 included_skills=("${published_skills[@]}")
-if [ -d vendor/ponytail/skills ]; then
+for vendor_skills_dir in vendor/*/skill*/; do
+  [ -d "$vendor_skills_dir" ] || continue
   while IFS= read -r line; do
     included_skills+=("$line")
   done < <(
-    find vendor/ponytail/skills -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
+    find "$vendor_skills_dir" -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
       | sed 's#/SKILL.md$##' \
       | sort
   )
-fi
+done
 included_skills=($(printf "%s\n" "${included_skills[@]}" | sort))
 
 manifest_skills=()

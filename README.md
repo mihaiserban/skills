@@ -34,7 +34,7 @@ our skills plus included vendored skills.
 |---|---|---|---|
 | `/setup-skills` | User | `disable-model-invocation` | Interactive bootstrap: issue tracker, triage labels, domain doc layout |
 | `/domain-modeling` | Model | Auto-invoked | Build and sharpen a project's domain glossary and ADRs |
-| `/frontend-design` | Model | Auto-invoked | Distinctive, intentional visual design for new or restyled UI |
+| `/design` | Model | Auto-invoked | Orchestrate the design workflow: picker → apply → audit |
 | `/design-md-style-picker` | Model | Auto-invoked | Choose a source aesthetic from `voltagent/awesome-design-md` |
 | `/design-md-style-apply` | Model | Auto-invoked | Translate a selected `DESIGN.md` aesthetic into product UI |
 | `/design-md-style-audit` | Model | Auto-invoked | Audit UI against a selected `DESIGN.md` source aesthetic |
@@ -59,7 +59,7 @@ manually by the user.
 | Skill | When it fires |
 |---|---|
 | `/domain-modeling` | Agent sees fuzzy domain language, needs to pin down terminology, or record an architectural decision |
-| `/frontend-design` | Task involves building or restyling a frontend — landing page, dashboard, app shell, marketing site |
+| `/design` | User asks to design a website, landing page, dashboard, app shell, or UI |
 | `/design-md-style-picker` | User wants a source design direction or asks what style to use |
 | `/design-md-style-apply` | User names a `DESIGN.md` style, brand, or source path to apply |
 | `/design-md-style-audit` | User asks whether an implementation matches a selected source style |
@@ -67,39 +67,49 @@ manually by the user.
 
 ## DESIGN.md Catalog
 
-The design skills use `https://github.com/voltagent/awesome-design-md`. Ensure a
-local checkout exists with:
+The design skills use `https://github.com/voltagent/awesome-design-md`, vendored
+as a git submodule at `vendor/awesome-design-md`. The `design_md_catalog.py`
+script discovers it automatically — no extra setup needed.
 
 ```bash
-python3 ~/.agents/skills/scripts/design_md_catalog.py ensure
+python3 scripts/design_md_catalog.py list
+python3 scripts/design_md_catalog.py search "dark dashboard trading"
+python3 scripts/design_md_catalog.py show vercel --lines 100
 ```
-
-By default it clones to `~/.cache/agents/awesome-design-md`. Set
-`DESIGN_MD_ROOT=/path/to/awesome-design-md` to use a different checkout.
 
 ## Included External Skills
 
-This repo includes `https://github.com/DietrichGebert/ponytail` as a git
-submodule under `vendor/ponytail`. Setup includes Ponytail's `skills/*`
-entries in `.claude-plugin/plugin.json` so host agents can discover them
-alongside this pack.
+Vendored skill packs live as git submodules under `vendor/`. Setup automatically
+discovers any `vendor/*/skill*/` directory containing `SKILL.md` files and
+includes them in `.claude-plugin/plugin.json`.
 
-Included Ponytail skills:
+Add a new vendor skill:
 
-| Skill | Description |
-|---|---|
-| `/ponytail` | Lazy senior dev mode: YAGNI, stdlib/native first, shortest working path |
-| `/ponytail-review` | Diff review focused only on over-engineering and deletion opportunities |
-| `/ponytail-audit` | Whole-repo over-engineering audit |
-| `/ponytail-debt` | Harvest `ponytail:` comments into a debt ledger |
-| `/ponytail-gain` | Display Ponytail's benchmark impact scoreboard |
-| `/ponytail-help` | Quick reference for Ponytail modes and commands |
+```bash
+bash scripts/add-vendor.sh https://github.com/vercel-labs/agent-browser
+bash scripts/add-vendor.sh https://github.com/vercel-labs/agent-browser --name agent-browser
+```
 
-Update vendored packs with:
+Remove a vendor skill:
+
+```bash
+bash scripts/remove-vendor.sh agent-browser
+```
+
+After adding or removing, re-run `bash scripts/setup.sh` to update the manifest.
+
+Update all vendored packs:
 
 ```bash
 git submodule update --remote --recursive
 ```
+
+### Included
+
+| Vendor | Source | Skills |
+|---|---|---|
+| **ponytail** | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | `/ponytail`, `/ponytail-review`, `/ponytail-audit`, `/ponytail-debt`, `/ponytail-gain`, `/ponytail-help` |
+| **awesome-design-md** | [voltagent/awesome-design-md](https://github.com/voltagent/awesome-design-md) | DESIGN.md catalog for style picker/apply/audit |
 
 ## Maintenance
 
@@ -149,22 +159,25 @@ vendored submodules.
 │   └── invocation.md     # user-invoked vs model-invoked vocabulary
 ├── scripts/
 │   ├── setup.sh          # detect harnesses → create symlinks + plugin.json
+│   ├── uninstall.sh      # remove symlinks
 │   ├── check-pack.sh     # validate README/manifest/skill structure
-│   ├── design_md_catalog.py # find/clone/search awesome-design-md profiles
-│   └── uninstall.sh      # remove symlinks
+│   ├── add-vendor.sh     # add an external skill pack as a git submodule
+│   ├── remove-vendor.sh  # remove a vendored skill pack submodule
+│   └── design_md_catalog.py # find/search awesome-design-md profiles
 ├── vendor/
-│   └── ponytail/
-│       └── skills/        # git submodule, 6 external skills included in manifest
+│   ├── ponytail/
+│   │   └── skills/        # git submodule, 6 external skills
+│   └── awesome-design-md/ # git submodule, DESIGN.md catalog
 ├── .claude-plugin/
 │   └── plugin.json       # auto-generated by setup.sh, 14 skills total
 ├── design/
+│   ├── SKILL.md               # root orchestrator — design workflow entry point
 │   ├── design-md-style-picker/
 │   ├── design-md-style-apply/
 │   ├── design-md-style-audit/
 │   └── design-taste-distiller/
 ├── engineering/
 │   ├── setup-skills/
-│   ├── domain-modeling/
-│   └── frontend-design/
+│   └── domain-modeling/
 └── research/
 ```

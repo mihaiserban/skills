@@ -12,7 +12,9 @@ from pathlib import Path
 
 REPO_URL = "https://github.com/voltagent/awesome-design-md.git"
 DEFAULT_CACHE_ROOT = Path.home() / ".cache" / "agents" / "awesome-design-md"
+VENDOR_ROOT = (Path(__file__).resolve().parent.parent / "vendor" / "awesome-design-md").resolve()
 KNOWN_ROOTS = [
+    VENDOR_ROOT,
     DEFAULT_CACHE_ROOT,
     Path.home() / "code" / "personal" / "projects" / "design_skills" / "awesome-design-md",
 ]
@@ -68,6 +70,11 @@ def find_root() -> Path:
     )
 
 
+def is_git_repo(path: Path) -> bool:
+    """True if path is a git checkout (handles submodules where .git is a file)."""
+    return (path / ".git").exists()
+
+
 def ensure_root(update: bool = False) -> Path:
     env_root = os.environ.get("DESIGN_MD_ROOT")
     target = Path(env_root).expanduser() if env_root else DEFAULT_CACHE_ROOT
@@ -76,12 +83,12 @@ def ensure_root(update: bool = False) -> Path:
     if not env_root:
         for root in candidate_roots():
             if has_design_md(root):
-                if update and (root / ".git").is_dir():
+                if update and is_git_repo(root):
                     subprocess.run(["git", "-C", str(root), "pull", "--ff-only"], check=True)
                 return root
 
     if has_design_md(target):
-        if update and (target / ".git").is_dir():
+        if update and is_git_repo(target):
             subprocess.run(["git", "-C", str(target), "pull", "--ff-only"], check=True)
         return target
 
