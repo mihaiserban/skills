@@ -33,7 +33,7 @@ Look at the current repo to understand its starting state:
 
 Summarise what's present and what's missing. Then walk the user through the three decisions **one at a time** — present a section, get the user's answer, then move to the next. Don't dump all three at once.
 
-Assume the user does not know what these terms mean. Each section starts with a short explainer (what it is, why these skills need it, what changes if they pick differently). Then show the choices and the default.
+Assume the user does not know what these terms mean. For each decision, explain what it is, why these skills need it, and what changes if they pick differently. Then show the choices and the default.
 
 **Section A — Issue tracker.**
 
@@ -55,21 +55,13 @@ If — and only if — the user picked **GitHub**, ask one follow-up:
 
 > Explainer: When a triage skill processes an incoming issue, it moves it through a state machine — needs evaluation, waiting on reporter, ready for an AFK agent to pick up, ready for a human, or won't fix. It needs to apply labels that match strings *you've actually configured*. If your repo already uses different label names (e.g. `bug:triage` instead of `needs-triage`), map them here.
 
-The five canonical roles:
-
-| Role | Meaning |
-|---|---|
-| `needs-triage` | Maintainer needs to evaluate |
-| `needs-info` | Waiting on reporter |
-| `ready-for-agent` | Fully specified, AFK-ready |
-| `ready-for-human` | Needs human implementation |
-| `wontfix` | Will not be actioned |
+The five canonical roles — see the seed template at `engineering/setup-skills/triage-labels.md` for the full table. This table mirrors the seed template — update both if changing role names.
 
 Default: each role's string equals its name. Ask the user if they want to override any.
 
 **Section C — Domain docs.**
 
-> Explainer: Some skills (`domain-modeling`, and future skills like diagnosing-bugs or tdd) read a `CONTEXT.md` file to learn the project's domain language, and `docs/adr/` for past architectural decisions. They need to know whether the repo has one global context or multiple (e.g. a monorepo with separate frontend/backend contexts) so they look in the right place.
+> Explainer: Some skills (`domain-modeling`, and future skills like diagnosing-bugs or tdd) read a `CONTEXT.md` file to learn the project's domain language, and `docs/adr/` for past architectural decisions. They need to know whether the repo has one global context or multiple so they look in the right place.
 
 Confirm the layout:
 
@@ -119,9 +111,15 @@ Then write the three docs files:
 
 - **`docs/agents/issue-tracker.md`** — use the seed template at `engineering/setup-skills/issue-tracker-github.md` as a starting point. Replace the PRs-as-request-surface flag with the user's answer. For local-markdown or other trackers, write from scratch using the user's description.
 - **`docs/agents/triage-labels.md`** — use the seed template at `engineering/setup-skills/triage-labels.md` as a starting point. Replace the right-hand column with the user's actual label strings.
-
 - **`docs/agents/domain.md`** — use the seed template at `engineering/setup-skills/domain.md` as a starting point. Customize the file structure diagram to match the user's layout (single vs multi-context).
 
 ### 5. Done
 
 Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
+
+## Gotchas
+
+- Never create `AGENTS.md` when `SESSION_START.md` already exists (or vice versa) — always edit the one that's already there.
+- Don't overwrite user edits to the surrounding sections when updating an existing `## Agent skills` block.
+- Assume the user does not know what these terms mean — front-load each decision with a short explainer.
+- If and only if the user picks GitHub, ask the PRs-as-request-surface follow-up. Don't ask it for local markdown or other trackers.

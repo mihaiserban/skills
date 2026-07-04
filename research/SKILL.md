@@ -8,24 +8,39 @@ disable-model-invocation: true
 
 ## Overview
 
-Use this skill to turn a topic or planning question into an evidence-grounded research brief. Prefer primary sources from arXiv, then connect the findings to the user's decision, design, or implementation context when relevant.
-
-Treat "arvix" as a likely typo for "arXiv".
+Use this skill to turn a topic or planning question into an evidence-grounded primary-source brief. Prefer primary sources from arXiv, then connect the findings to the user's decision, design, or implementation context when relevant.
 
 Do not invoke this skill just because a task involves planning, design, or implementation. Invoke it only when the user explicitly asks for research, arXiv/arvix, papers, prior art, or academic evidence.
+
+## Setup
+
+```bash
+pip install arxiv
+```
+
+If `arxiv` is unavailable, use web access with `site:arxiv.org` searches as a fallback.
 
 ## Workflow
 
 1. Restate the user's topic or planning question as a research question.
-2. Search arXiv for recent and foundational papers using multiple keyword variants.
-3. Prioritize primary papers over blog posts, summaries, or secondary commentary.
+2. Search arXiv for recent and foundational papers using ≥3 keyword variants. Collect ≥5 candidate papers before filtering.
+3. Prioritize primary papers over blog posts, summaries, or secondary commentary. Tag each candidate as primary/secondary/irrelevant before proceeding.
 4. Read enough of each selected paper to identify the problem, method, assumptions, empirical results, limitations, and implementation details.
 5. Synthesize the findings into decisions that matter for the user's plan, design, experiment, or build task.
-6. Return a concise, citation-backed brief that can inform planning or later implementation.
+6. Return a concise, citation-backed primary-source brief.
 
 ## Search Strategy
 
-Use current web access when available. Good starting searches include:
+Use the `arxiv` Python package when available:
+
+```python
+import arxiv
+search = arxiv.Search(query="<topic> <method or domain>", max_results=10, sort_by=arxiv.SortCriterion.Relevance)
+for result in search.results():
+    print(result.title, result.pdf_url)
+```
+
+Fallback web searches:
 
 ```text
 site:arxiv.org <topic> <method or domain>
@@ -56,11 +71,15 @@ For each useful paper, capture:
 - Limitations, failure modes, or conditions where the method is inappropriate.
 - Any details that translate directly into design choices, architecture, APIs, tests, evaluation metrics, or acceptance criteria.
 
-Do not overfit to abstracts. Open the paper or arXiv page when possible, and inspect method sections, figures, ablations, appendices, or code links if they are important to implementation.
+## Gotchas
+
+- Do not overfit to abstracts. Open the paper or arXiv page when possible, and inspect method sections, figures, ablations, appendices, or code links if they are important to implementation.
+- "arxiv" often appears as a typo ("arvix", "arvix.org") — treat these as arXiv.
+- If the research is inconclusive, say so plainly rather than padding the brief.
 
 ## Synthesis
 
-Produce a compact research brief:
+Produce a compact primary-source brief:
 
 - `Question`: the topic or decision being researched.
 - `Papers`: the most relevant papers with links.
@@ -70,6 +89,10 @@ Produce a compact research brief:
 - `Practical notes`: concrete code, API, data, model, evaluation, UX, or process implications when relevant.
 
 If the research is inconclusive, say so plainly and recommend the next best query, experiment, or reversible planning step.
+
+## Memory
+
+After producing a primary-source brief, append a one-line entry to `.research-log` with the topic, date, and key finding. Future invocations can reference past briefs.
 
 ## Handoff
 

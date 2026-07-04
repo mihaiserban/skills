@@ -1,33 +1,45 @@
 ---
 name: design-md-style-picker
-description: Choose an appropriate source aesthetic from voltagent/awesome-design-md DESIGN.md profiles for a product, app, landing page, dashboard, or redesign brief. Use when the user wants design direction, asks what style to use, says to make something look like a known brand/site, or gives a product brief without a clear visual system and Codex should select a DESIGN.md profile before building.
+description: Choose an appropriate source aesthetic from voltagent/awesome-design-md DESIGN.md profiles for a product, app, landing page, dashboard, or redesign brief. Use when the user wants design direction, asks what style to use, or gives a product brief without a clear visual system and needs a DESIGN.md profile selected before building.
 ---
 
 # DESIGN.md Style Picker
 
 ## Overview
 
-Use the local checkout of `https://github.com/voltagent/awesome-design-md` to choose a source aesthetic that fits the product brief. Return a decisive recommendation, the selected `DESIGN.md` path, and the design moves that should survive translation into the new product. If the project has `TASTE.md`, use it as the judgment layer before choosing a source style.
+Use the local checkout of `https://github.com/voltagent/awesome-design-md` to choose a source aesthetic that fits the product brief. Return a decisive recommendation, the selected `DESIGN.md` path, and the design moves that should survive translation into the new product.
+
+## Prerequisites
+
+Requires Python 3 and the scripts bundled with this skill pack. Find the catalog script:
+
+```bash
+# Preferred: environment variable
+python3 "$SKILLS_SCRIPTS/design_md_catalog.py" ensure
+
+# Fallback: relative to skill pack root
+python3 scripts/design_md_catalog.py ensure
+```
 
 ## Catalog Workflow
 
-1. Find the catalog with:
+1. Find the catalog:
 
 ```bash
-python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py ensure
-python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py list
+python3 "$SKILLS_SCRIPTS/design_md_catalog.py" ensure
+python3 "$SKILLS_SCRIPTS/design_md_catalog.py" list
 ```
 
 2. Search by product category, mood, or named style:
 
 ```bash
-python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py search "developer tool dark precise"
+python3 "$SKILLS_SCRIPTS/design_md_catalog.py search "developer tool dark precise"
 ```
 
 3. Inspect only the strongest candidates:
 
 ```bash
-python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py show vercel --lines 140
+python3 "$SKILLS_SCRIPTS/design_md_catalog.py show vercel --lines 140
 ```
 
 4. Read `references/selection-rubric.md` before making the final pick when the brief is ambiguous or more than one style could work.
@@ -43,9 +55,15 @@ python3 /Users/mitzuuuu/.agents/skills/scripts/design_md_catalog.py show vercel 
 - Choose a style whose structure fits the product's real workflow. For example, use Linear/Superhuman/Raycast for keyboard-first tools, Runway/Pinterest/Nike for media-first products, and ClickHouse/Supabase/Stripe for developer-facing technical surfaces.
 - Preserve the source's decisive constraints: palette discipline, typography rhythm, spacing density, component geometry, motion behavior, and signature visual gesture.
 
+## Gotchas
+
+- Don't pick a style solely for its accent color — a cohesive translation needs typography, spacing, and component geometry too.
+- Matching a marketing-heavy source to a data-dense product produces a shallow skin, not a design.
+- Exhaust one source before reaching for a second — mixed styles usually feel less designed than a single strong source.
+
 ## Recommendation Format
 
-Give the future builder enough to act without re-deciding the direction:
+Give the future builder enough to act without re-deciding the direction. Done when every DNA category is filled with at least one concrete design move from the source. Mark any category you cannot fill and explain why in "Avoid."
 
 ```markdown
 Selected style: <slug>

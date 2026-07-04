@@ -7,7 +7,7 @@ description: Build and sharpen a project's domain model. Use when the user wants
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Interrogate the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
 ## File structure
 
@@ -39,13 +39,13 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 │       └── docs/adr/
 ```
 
-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create files lazily — only when you have something to write.
 
 ## During the session
 
 ### Challenge against the glossary
 
-When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. A term conflicts when it either (a) is absent from CONTEXT.md, or (b) has a different meaning assigned in the glossary. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
 
 ### Sharpen fuzzy language
 
@@ -61,16 +61,20 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Update CONTEXT.md inline
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+When a term is resolved — the user has confirmed the canonical term and its definition — update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
 
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+`CONTEXT.md` is a glossary and nothing else.
 
 ### Offer ADRs sparingly
 
-Only offer to create an ADR when all three are true:
+Only offer to create an ADR when the three criteria in [ADR-FORMAT.md](./ADR-FORMAT.md) are all met. If any is missing, skip the ADR.
 
-1. **Hard to reverse** — the cost of changing your mind later is meaningful
-2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
+## Gotchas
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+- Two contexts using the same term differently is a common domain smell — flag it whenever you see it.
+- Code contradicting a freshly resolved term must surface immediately; don't let the glossary and codebase drift apart.
+- When an ADR is borderline (two of three criteria met, third unclear), ask the user rather than silently skipping.
+
+### Validate before ending
+
+Before ending the session, confirm that `CONTEXT.md` reflects every term resolved this session.

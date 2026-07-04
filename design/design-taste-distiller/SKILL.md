@@ -24,7 +24,7 @@ Accept any mix of:
 If inputs are files, inspect them directly. If the reference set is text-heavy, use:
 
 ```bash
-python3 /Users/mitzuuuu/.agents/skills/design/design-taste-distiller/scripts/taste_scaffold.py --output TASTE.md <paths...>
+python3 "$SKILLS_SCRIPTS/design-taste-distiller/scripts/taste_scaffold.py" --output TASTE.md <paths...>
 ```
 
 The scaffold is only a starting point. Fill it with real judgment from the references.
@@ -49,11 +49,11 @@ The scaffold is only a starting point. Fill it with real judgment from the refer
    - "Let typography carry personality before adding decorative effects."
    - "Make premium mean control, spacing, and material confidence, not generic dark gloss."
 
-4. Add execution controls:
-   - a one-line `Design Read` pattern for future agents to state before building
-   - `Execution Dials` for variance, motion, and density
-   - `Design Locks` for accent color, radius system, type system, theme, and CTA language
-   - `Preflight Checks` that must pass before shipping
+4. Add execution controls as defined in the taste rubric (see `references/taste-rubric.md`):
+   - a one-line `Design Read`
+   - `Execution Dials`
+   - `Design Locks`
+   - `Preflight Checks`
 
 5. Add a critique loop:
    - questions the agent must ask before building
@@ -116,6 +116,9 @@ Use `Workflow Modes` to encode how design work should proceed, such as explore, 
 - Preserve user voice. If the user has strong phrasing, include it directly in short quotes.
 - Make the workflow opinionated. Good taste often comes from critique loops and mode-specific playbooks, not a single generation pass.
 - Make the checks mechanical where possible. "One accent color per page" is easier to enforce than "make it tasteful."
+- A strong TASTE.md lets another agent decide whether to pick Linear or Runway for a brief — aim for that level of decision guidance.
+
+For the full rubric and execution control definitions, see `references/taste-rubric.md`.
 
 ## Using With DESIGN.md
 

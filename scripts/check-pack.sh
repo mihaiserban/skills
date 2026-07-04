@@ -11,14 +11,14 @@ fail() {
 
 published_prefix() {
   case "$1" in
-    design|design/*|engineering/*|research|research/*) return 0 ;;
+    design|design/*|engineering/*|general/*|research|research/*) return 0 ;;
     *) return 1 ;;
   esac
 }
 
 included_prefix() {
   case "$1" in
-    design|design/*|engineering/*|research|research/*|vendor/*/skill*/*) return 0 ;;
+    design|design/*|engineering/*|general/*|research|research/*|vendor/*/skill*/*) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -30,7 +30,7 @@ published_skills=()
 while IFS= read -r line; do
   published_skills+=("$line")
 done < <(
-  find design engineering research -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
+  find design engineering general research -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
     | sed 's#/SKILL.md$##' \
     | sort
 )

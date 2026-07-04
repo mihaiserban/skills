@@ -40,6 +40,7 @@ our skills plus included vendored skills.
 | `/design-md-style-audit` | Model | Auto-invoked | Audit UI against a selected `DESIGN.md` source aesthetic |
 | `/design-taste-distiller` | Model | Auto-invoked | Distill references into a compact `TASTE.md` |
 | `/research` | User | `disable-model-invocation` | Research a technical or scientific topic on arXiv |
+| `/skill-evaluation` | Model | Auto-invoked | Evaluate a skill across 4 axes with an evidence-cited scorecard |
 
 ### User-invoked skills
 
@@ -64,6 +65,7 @@ manually by the user.
 | `/design-md-style-apply` | User names a `DESIGN.md` style, brand, or source path to apply |
 | `/design-md-style-audit` | User asks whether an implementation matches a selected source style |
 | `/design-taste-distiller` | User wants reusable visual taste guidelines or a `TASTE.md` |
+| `/skill-evaluation` | User asks to evaluate, rate, audit, or compare a skill |
 
 ## DESIGN.md Catalog
 
@@ -123,7 +125,7 @@ After adding, deleting, moving, or renaming a skill, run:
 bash scripts/check-pack.sh
 ```
 
-Expected result today: `8 published skill(s), 14 manifest skill(s)`.
+Expected result today: `9 published skill(s), 22 manifest skill(s)`.
 
 ## Verification
 
@@ -179,5 +181,7 @@ vendored submodules.
 ├── engineering/
 │   ├── setup-skills/
 │   └── domain-modeling/
+├── general/
+│   └── skill-evaluation/
 └── research/
 ```
