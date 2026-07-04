@@ -32,40 +32,68 @@ our skills plus included vendored skills.
 
 | Skill | Invocation | Type | Description |
 |---|---|---|---|
-| `/setup-skills` | User | `disable-model-invocation` | Interactive bootstrap: issue tracker, triage labels, domain doc layout |
-| `/domain-modeling` | Model | Auto-invoked | Build and sharpen a project's domain glossary and ADRs |
+| `/adversarial-verify` | Model | Auto-invoked | Review a diff against the goal spec assuming the code is BROKEN |
+| `/changelog-from-diff` | Model | Auto-invoked | Turn commits or a diff into a clean user-facing changelog entry |
+| `/clean-commits` | Model | Auto-invoked | Turn messy WIP into clean, atomic commits |
+| `/context-budget` | Model | Auto-invoked | Keep agent context lean on long sessions or big files |
+| `/contract-test` | Model | Auto-invoked | Test the boundary between two systems by the contract |
+| `/decision-record` | Model | Auto-invoked | Capture an architectural decision so the next session knows WHY |
 | `/design` | Model | Auto-invoked | Orchestrate the design workflow: picker → apply → audit |
 | `/design-md-style-picker` | Model | Auto-invoked | Choose a source aesthetic from `voltagent/awesome-design-md` |
 | `/design-md-style-apply` | Model | Auto-invoked | Translate a selected `DESIGN.md` aesthetic into product UI |
 | `/design-md-style-audit` | Model | Auto-invoked | Audit UI against a selected `DESIGN.md` source aesthetic |
 | `/design-taste-distiller` | Model | Auto-invoked | Distill references into a compact `TASTE.md` |
+| `/domain-modeling` | Model | Auto-invoked | Build and sharpen a project's domain glossary and ADRs |
+| `/input-validation` | Model | Auto-invoked | Validate untrusted input at the boundary |
+| `/kill-dead-code` | Model | Auto-invoked | Find and remove unreachable/unused code safely |
+| `/pr-from-diff` | Model | Auto-invoked | Write a PR description a reviewer can approve fast |
+| `/rebase-safely` | Model | Auto-invoked | Rebase, squash, or rewrite history without losing work |
+| `/reduce-nesting` | Model | Auto-invoked | Flatten deeply nested conditionals into early-return code |
 | `/research` | User | `disable-model-invocation` | Research a technical or scientific topic on arXiv |
+| `/secret-scan` | Model | Auto-invoked | Catch hardcoded secrets before they get committed |
+| `/setup-skills` | User | `disable-model-invocation` | Interactive bootstrap: issue tracker, triage labels, domain doc layout |
+| `/bisect-regression` | Model | Auto-invoked | Binary-search git history to find the commit that introduced a bug |
+| `/revert-surgical` | Model | Auto-invoked | Revert a specific commit cleanly without touching unrelated changes |
 | `/skill-evaluation` | Model | Auto-invoked | Evaluate a skill across 4 axes with an evidence-cited scorecard |
+| `/sql-review` | Model | Auto-invoked | Review SQL and ORM queries for correctness, safety, and performance |
+| `/subagent-fanout` | Model | Auto-invoked | Parallelize independent sub-jobs across fresh-context subagents |
+| `/systematic-debugging` | Model | Auto-invoked | Reproduce-then-isolate before proposing a fix — no guessing |
 
 ### User-invoked skills
 
-Reachable only by typing the slash-command. They orchestrate — the human drives
-them, and they may invoke model-invoked skills along the way.
-
 | Skill | When to use |
 |---|---|
-| `/setup-skills` | Once per repo. Configures issue tracker, labels, domain layout before other skills run |
 | `/research` | Research a technical or scientific topic on arXiv |
+| `/setup-skills` | Once per repo. Configures issue tracker, labels, domain layout before other skills run |
 
 ### Model-invoked skills
 
-Can be reached automatically by the agent when the task fits, or invoked
-manually by the user.
-
 | Skill | When it fires |
 |---|---|
-| `/domain-modeling` | Agent sees fuzzy domain language, needs to pin down terminology, or record an architectural decision |
+| `/adversarial-verify` | After code changes, before marking work done or committing |
+| `/changelog-from-diff` | Before a release or writing a PR description |
+| `/clean-commits` | Before opening a PR with messy commit history |
+| `/context-budget` | Long sessions, big files, or agent hallucinating |
+| `/contract-test` | APIs, integrations, shared interfaces |
+| `/decision-record` | After any non-obvious technical choice |
 | `/design` | User asks to design a website, landing page, dashboard, app shell, or UI |
 | `/design-md-style-picker` | User wants a source design direction or asks what style to use |
-| `/design-md-style-apply` | User names a `DESIGN.md` style, brand, or source path to apply |
-| `/design-md-style-audit` | User asks whether an implementation matches a selected source style |
+| `/design-md-style-apply` | User names a `DESIGN.md` style, brand, or source path |
+| `/design-md-style-audit` | User asks whether an implementation matches a source style |
 | `/design-taste-distiller` | User wants reusable visual taste guidelines or a `TASTE.md` |
+| `/domain-modeling` | Fuzzy domain language, needs to pin down terminology, or record an ADR |
+| `/input-validation` | Any handler that accepts external data |
+| `/kill-dead-code` | Cleanup or before a refactor |
+| `/pr-from-diff` | Opening any pull request |
+| `/rebase-safely` | Before any history rewrite |
+| `/reduce-nesting` | Functions with 3+ levels of indentation |
+| `/secret-scan` | Before any commit, on files with credentials |
 | `/skill-evaluation` | User asks to evaluate, rate, audit, or compare a skill |
+| `/sql-review` | New queries, migrations, N+1 suspicions, slow endpoints |
+| `/subagent-fanout` | A goal that branches into many independent pieces |
+| `/systematic-debugging` | ANY bug, test failure, crash, or unexpected behavior |
+| `/bisect-regression` | A bug appeared between two known commits |
+| `/revert-surgical` | A specific commit needs to be undone without reverting the whole PR |
 
 ## DESIGN.md Catalog
 
@@ -125,7 +153,7 @@ After adding, deleting, moving, or renaming a skill, run:
 bash scripts/check-pack.sh
 ```
 
-Expected result today: `9 published skill(s), 22 manifest skill(s)`.
+Expected result today: `26 published skill(s), 32 manifest skill(s)`.
 
 ## Verification
 
@@ -171,17 +199,37 @@ vendored submodules.
 │   │   └── skills/        # git submodule, 6 external skills
 │   └── awesome-design-md/ # git submodule, DESIGN.md catalog
 ├── .claude-plugin/
-│   └── plugin.json       # auto-generated by setup.sh, 14 skills total
+│   └── plugin.json
+├── agents/
+│   ├── context-budget/
+│   └── subagent-fanout/
 ├── design/
 │   ├── SKILL.md               # root orchestrator — design workflow entry point
 │   ├── design-md-style-picker/
 │   ├── design-md-style-apply/
 │   ├── design-md-style-audit/
 │   └── design-taste-distiller/
+├── documentation/
+│   ├── changelog-from-diff/
+│   └── decision-record/
 ├── engineering/
+│   ├── adversarial-verify/
+│   ├── bisect-regression/
+│   ├── contract-test/
+│   ├── domain-modeling/
+│   ├── input-validation/
+│   ├── kill-dead-code/
+│   ├── reduce-nesting/
+│   ├── secret-scan/
 │   ├── setup-skills/
-│   └── domain-modeling/
+│   ├── sql-review/
+│   └── systematic-debugging/
 ├── general/
 │   └── skill-evaluation/
+├── git-ops/
+│   ├── clean-commits/
+│   ├── pr-from-diff/
+│   ├── rebase-safely/
+│   └── revert-surgical/
 └── research/
 ```
