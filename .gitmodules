@@ -7,3 +7,6 @@
 [submodule "vendor/content-skills"]
 	path = vendor/content-skills
 	url = https://github.com/vyralcontent/content-skills
+[submodule "vendor/awesome-copilot"]
+	path = vendor/awesome-copilot
+	url = https://github.com/github/awesome-copilot
