@@ -33,6 +33,8 @@ our skills plus included vendored skills.
 | Skill | Invocation | Type | Description |
 |---|---|---|---|
 | `/adversarial-verify` | Model | Auto-invoked | Review a diff against the goal spec assuming the code is BROKEN |
+| `/bisect-regression` | Model | Auto-invoked | Binary-search git history to find the commit that introduced a bug |
+| `/blog-post` | User | `disable-model-invocation` | Distill a conversation or completed task into a mihaiserban.dev blog post |
 | `/changelog-from-diff` | Model | Auto-invoked | Turn commits or a diff into a clean user-facing changelog entry |
 | `/clean-commits` | Model | Auto-invoked | Turn messy WIP into clean, atomic commits |
 | `/context-budget` | Model | Auto-invoked | Keep agent context lean on long sessions or big files |
@@ -56,13 +58,14 @@ our skills plus included vendored skills.
 | `/revert-surgical` | Model | Auto-invoked | Revert a specific commit cleanly without touching unrelated changes |
 | `/skill-evaluation` | Model | Auto-invoked | Evaluate a skill across 4 axes with an evidence-cited scorecard |
 | `/sql-review` | Model | Auto-invoked | Review SQL and ORM queries for correctness, safety, and performance |
-| `/subagent-fanout` | Model | Auto-invoked | Parallelize independent sub-jobs across fresh-context subagents |
+| `/governance-fanout` | Model | Auto-invoked | Fan out independent sub-jobs across fresh-context workers using file-based task specs |
 | `/systematic-debugging` | Model | Auto-invoked | Reproduce-then-isolate before proposing a fix — no guessing |
 
 ### User-invoked skills
 
 | Skill | When to use |
 |---|---|
+| `/blog-post` | User wants to turn a conversation or task into a blog post |
 | `/research` | Research a technical or scientific topic on arXiv |
 | `/setup-skills` | Once per repo. Configures issue tracker, labels, domain layout before other skills run |
 
@@ -90,7 +93,7 @@ our skills plus included vendored skills.
 | `/secret-scan` | Before any commit, on files with credentials |
 | `/skill-evaluation` | User asks to evaluate, rate, audit, or compare a skill |
 | `/sql-review` | New queries, migrations, N+1 suspicions, slow endpoints |
-| `/subagent-fanout` | A goal that branches into many independent pieces |
+| `/governance-fanout` | A goal that branches into many independent pieces |
 | `/systematic-debugging` | ANY bug, test failure, crash, or unexpected behavior |
 | `/bisect-regression` | A bug appeared between two known commits |
 | `/revert-surgical` | A specific commit needs to be undone without reverting the whole PR |
@@ -202,7 +205,7 @@ vendored submodules.
 │   └── plugin.json
 ├── agents/
 │   ├── context-budget/
-│   └── subagent-fanout/
+│   └── governance-fanout/
 ├── design/
 │   ├── SKILL.md               # root orchestrator — design workflow entry point
 │   ├── design-md-style-picker/
@@ -231,5 +234,7 @@ vendored submodules.
 │   ├── pr-from-diff/
 │   ├── rebase-safely/
 │   └── revert-surgical/
+├── mihaiserban.dev/
+│   └── blog-post/
 └── research/
 ```

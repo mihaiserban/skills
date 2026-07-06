@@ -3,11 +3,11 @@
   "skills": [
     "./agents/context-budget",
     "./agents/governance-fanout",
-    "./design",
     "./design/design-md-style-apply",
     "./design/design-md-style-audit",
     "./design/design-md-style-picker",
     "./design/design-taste-distiller",
+    "./design",
     "./documentation/changelog-from-diff",
     "./documentation/decision-record",
     "./engineering/adversarial-verify",
@@ -28,11 +28,11 @@
     "./git-ops/revert-surgical",
     "./mihaiserban.dev/blog-post",
     "./research",
-    "./vendor/ponytail/skills/ponytail",
     "./vendor/ponytail/skills/ponytail-audit",
     "./vendor/ponytail/skills/ponytail-debt",
     "./vendor/ponytail/skills/ponytail-gain",
     "./vendor/ponytail/skills/ponytail-help",
-    "./vendor/ponytail/skills/ponytail-review"
+    "./vendor/ponytail/skills/ponytail-review",
+    "./vendor/ponytail/skills/ponytail"
   ]
 }

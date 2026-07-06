@@ -112,7 +112,7 @@ while IFS= read -r -d '' skill_md; do
   rel="${skill_dir#$REPO_ROOT/}"
   SKILL_DIRS+=("$rel")
 done < <(
-  find "$REPO_ROOT/design" "$REPO_ROOT/engineering" "$REPO_ROOT/research" \
+  find "$REPO_ROOT/agents" "$REPO_ROOT/design" "$REPO_ROOT/documentation" "$REPO_ROOT/engineering" "$REPO_ROOT/general" "$REPO_ROOT/git-ops" "$REPO_ROOT/mihaiserban.dev" "$REPO_ROOT/research" \
     -name "SKILL.md" \
     -not -path "*/.git/*" \
     -print0 2>/dev/null | sort -z

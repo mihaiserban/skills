@@ -11,14 +11,14 @@ fail() {
 
 published_prefix() {
   case "$1" in
-    agents|agents/*|design|design/*|documentation|documentation/*|engineering/*|general/*|git-ops|git-ops/*|research|research/*) return 0 ;;
+    agents|agents/*|design|design/*|documentation|documentation/*|engineering/*|general/*|git-ops|git-ops/*|mihaiserban.dev|mihaiserban.dev/*|research|research/*) return 0 ;;
     *) return 1 ;;
   esac
 }
 
 included_prefix() {
   case "$1" in
-    agents|agents/*|design|design/*|documentation|documentation/*|engineering/*|general/*|git-ops|git-ops/*|research|research/*|vendor/*/skill*/*) return 0 ;;
+    agents|agents/*|design|design/*|documentation|documentation/*|engineering/*|general/*|git-ops|git-ops/*|mihaiserban.dev|mihaiserban.dev/*|research|research/*|vendor/*/skill*/*) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -30,7 +30,7 @@ published_skills=()
 while IFS= read -r line; do
   published_skills+=("$line")
 done < <(
-  find agents design documentation engineering general git-ops research -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
+  find agents design documentation engineering general git-ops mihaiserban.dev research -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
     | sed 's#/SKILL.md$##' \
     | sort
 )

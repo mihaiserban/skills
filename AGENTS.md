@@ -11,7 +11,9 @@ Published buckets:
 - `design/` — frontend design, DESIGN.md translation, visual taste.
 - `documentation/` — changelogs, decision records, and documentation workflows.
 - `engineering/` — engineering workflows and reusable engineering discipline.
+- `general/` — cross-cutting skills that don't fit a single domain bucket.
 - `git-ops/` — git operations: clean commits, PRs, rebasing.
+- `mihaiserban.dev/` — personal website workflows.
 - `research/` — explicit research workflows.
 
 Non-published buckets, if created later:
@@ -28,7 +30,7 @@ be documented as external packs, not as skills authored by this repository.
 
 ## Manifest Rules
 
-Every `SKILL.md` under `agents/`, `design/`, `documentation/`, `engineering/`, `git-ops/`, or `research/` must have:
+Every `SKILL.md` under `agents/`, `design/`, `documentation/`, `engineering/`, `general/`, `git-ops/`, `mihaiserban.dev/`, or `research/` must have:
 
 - a README entry
 - a `.claude-plugin/plugin.json` entry
