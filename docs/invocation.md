@@ -49,6 +49,7 @@ User-invoked:
 
 - `/setup-skills`
 - `/research`
+- `/show-first`
 
 Model-invoked:
 

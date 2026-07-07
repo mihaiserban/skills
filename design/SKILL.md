@@ -36,6 +36,8 @@ or user feedback into a reusable `TASTE.md` for future design work.
 | User says | Route |
 |---|---|
 | "Design a website/dashboard/app" | Default pipeline: picker → apply → audit |
+| "Show me the feature before building it" | route to `/show-first` → apply → audit |
+| "Plan before building" / "wireframe first" | route to `/show-first` |
 | "Build X in the style of Y" | skip picker, route to apply → audit |
 | "What style fits my project?" | route to `/design-md-style-picker` |
 | "Does this match the DESIGN.md?" | route to `/design-md-style-audit` |

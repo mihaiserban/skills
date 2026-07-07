@@ -45,6 +45,7 @@ our skills plus included vendored skills.
 | `/design-md-style-apply` | Model | Auto-invoked | Translate a selected `DESIGN.md` aesthetic into product UI |
 | `/design-md-style-audit` | Model | Auto-invoked | Audit UI against a selected `DESIGN.md` source aesthetic |
 | `/design-taste-distiller` | Model | Auto-invoked | Distill references into a compact `TASTE.md` |
+| `/show-first` | User | `disable-model-invocation` | Plan a feature with a low-fi wireframe + systems plan before coding |
 | `/domain-modeling` | Model | Auto-invoked | Build and sharpen a project's domain glossary and ADRs |
 | `/input-validation` | Model | Auto-invoked | Validate untrusted input at the boundary |
 | `/kill-dead-code` | Model | Auto-invoked | Find and remove unreachable/unused code safely |
@@ -68,6 +69,7 @@ our skills plus included vendored skills.
 | `/blog-post` | User wants to turn a conversation or task into a blog post |
 | `/research` | Research a technical or scientific topic on arXiv |
 | `/setup-skills` | Once per repo. Configures issue tracker, labels, domain layout before other skills run |
+| `/show-first` | User wants to see a feature plan + wireframe before any code is written |
 
 ### Model-invoked skills
 
@@ -211,7 +213,8 @@ vendored submodules.
 │   ├── design-md-style-picker/
 │   ├── design-md-style-apply/
 │   ├── design-md-style-audit/
-│   └── design-taste-distiller/
+│   ├── design-taste-distiller/
+│   └── show-first/
 ├── documentation/
 │   ├── changelog-from-diff/
 │   └── decision-record/
