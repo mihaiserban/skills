@@ -4,3 +4,6 @@
 [submodule "vendor/awesome-design-md"]
 	path = vendor/awesome-design-md
 	url = https://github.com/voltagent/awesome-design-md.git
+[submodule "vendor/agent-skills"]
+	path = vendor/agent-skills
+	url = https://github.com/addyosmani/agent-skills

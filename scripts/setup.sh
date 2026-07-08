@@ -74,27 +74,27 @@ SKIPPED=0
 NOT_FOUND=0
 
 if is_pi; then
-  if link_harness "pi" "$HOME/.agents" "skills" "pi"; then ((SYMLINKED++)); else ((SKIPPED++)); fi
+  if link_harness "pi" "$HOME/.agents" "skills" "pi"; then SYMLINKED=$((SYMLINKED + 1)); else SKIPPED=$((SKIPPED + 1)); fi
 else
-  echo -e " ${RED}✗${NC}  pi (not installed)"; ((NOT_FOUND++))
+  echo -e " ${RED}✗${NC}  pi (not installed)"; NOT_FOUND=$((NOT_FOUND + 1))
 fi
 
 if is_claude; then
-  if link_harness "Claude Code" "$HOME/.claude" "skills/mihaiserban-skills" "claude"; then ((SYMLINKED++)); else ((SKIPPED++)); fi
+  if link_harness "Claude Code" "$HOME/.claude" "skills/mihaiserban-skills" "claude"; then SYMLINKED=$((SYMLINKED + 1)); else SKIPPED=$((SKIPPED + 1)); fi
 else
-  echo -e " ${RED}✗${NC}  Claude Code (not installed)"; ((NOT_FOUND++))
+  echo -e " ${RED}✗${NC}  Claude Code (not installed)"; NOT_FOUND=$((NOT_FOUND + 1))
 fi
 
 if is_opencode; then
-  if link_harness "OpenCode" "$HOME/.opencode" "skills/mihaiserban-skills" "opencode"; then ((SYMLINKED++)); else ((SKIPPED++)); fi
+  if link_harness "OpenCode" "$HOME/.opencode" "skills/mihaiserban-skills" "opencode"; then SYMLINKED=$((SYMLINKED + 1)); else SKIPPED=$((SKIPPED + 1)); fi
 else
-  echo -e " ${RED}✗${NC}  OpenCode (not installed)"; ((NOT_FOUND++))
+  echo -e " ${RED}✗${NC}  OpenCode (not installed)"; NOT_FOUND=$((NOT_FOUND + 1))
 fi
 
 if is_codex; then
-  if link_harness "Codex" "$HOME/.codex" "skills/mihaiserban-skills" "codex"; then ((SYMLINKED++)); else ((SKIPPED++)); fi
+  if link_harness "Codex" "$HOME/.codex" "skills/mihaiserban-skills" "codex"; then SYMLINKED=$((SYMLINKED + 1)); else SKIPPED=$((SKIPPED + 1)); fi
 else
-  echo -e " ${RED}✗${NC}  Codex (not installed)"; ((NOT_FOUND++))
+  echo -e " ${RED}✗${NC}  Codex (not installed)"; NOT_FOUND=$((NOT_FOUND + 1))
 fi
 
 echo ""
