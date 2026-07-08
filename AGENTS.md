@@ -14,7 +14,7 @@ Published buckets:
 - `general/` — cross-cutting skills that don't fit a single domain bucket.
 - `git-ops/` — git operations: clean commits, PRs, rebasing.
 - `mihaiserban.dev/` — personal website workflows.
-- `research/` — explicit research workflows.
+- `references/` — shared checklists and behavioral standards that skills pull in on-demand.
 
 Non-published buckets, if created later:
 

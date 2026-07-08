@@ -15,6 +15,10 @@ echo -e "${CYAN}  Repo: ${REPO_ROOT}${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
+VENDOR_SKILL_EXCLUSIONS=(
+  "vendor/agent-skills/skills/using-agent-skills"
+)
+
 # ── Helpers ──────────────────────────────────────────────────────────
 
 is_pi()     { command -v pi >/dev/null 2>&1 || [ -d "$HOME/.agents" ]; }
@@ -123,6 +127,11 @@ for vendor_skills_dir in "$REPO_ROOT"/vendor/*/skill*/; do
   while IFS= read -r -d '' skill_md; do
     skill_dir="$(dirname "$skill_md")"
     rel="${skill_dir#$REPO_ROOT/}"
+    skip=false
+    for excl in "${VENDOR_SKILL_EXCLUSIONS[@]}"; do
+      [ "$rel" = "$excl" ] && skip=true && break
+    done
+    [ "$skip" = true ] && continue
     SKILL_DIRS+=("$rel")
   done < <(
     find "$vendor_skills_dir" \

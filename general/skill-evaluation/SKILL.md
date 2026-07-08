@@ -186,3 +186,13 @@ when it's notable; don't score the portfolio.
 - Fresh rewrites still carry duplication: sediment needs time to settle, but
   duplication can ship on day one. Run the pruning axis even on brand-new
   skills.
+
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "This skill is too small to evaluate" | Tiny skills flood the scorecard with N/A but can still hit grade A on few criteria. Evaluation reveals what's sharp and what's missing. |
+| "I wrote the skill, I know it's good" | Author-blindness is real. The deletion test and evidence-cited scoring catch what you won't see. |
+| "A scorecard is overkill for a simple workflow" | Simple workflows are where sloppiness hides. A 50-line skill with bad steering is worse than no skill. |
+| "I'll evaluate it after I've used it for a while" | Evaluation while the skill is fresh catches duplication and no-ops before they ossify into "how we've always done it." |
+| "My skill doesn't fit any category" | The category decision tree covers common shapes. If truly novel, document why — that itself is useful evaluation data. |

@@ -78,3 +78,13 @@ Only offer to create an ADR when the three criteria in [ADR-FORMAT.md](./ADR-FOR
 ### Validate before ending
 
 Before ending the session, confirm that `CONTEXT.md` reflects every term resolved this session.
+
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "The domain is obvious, I don't need to write it down" | "Obvious" to you is a mystery to the next person. The glossary exists for sessions 2, 5, and 50. |
+| "I'll update CONTEXT.md after we finish the feature" | Terms shift during implementation. Capture them as they crystallize — "later" means "from memory, wrong." |
+| "This decision is too small for an ADR" | Schema changes, auth choices, and data model decisions are NOT small. A one-line ADR is better than no ADR. |
+| "I'll just refer to the code for terminology" | Code uses internal names, not domain language. The glossary bridges the code and the business. |
+| "Two terms for the same thing is just a naming inconsistency" | It's a domain smell. Different names imply different concepts — find out which is right. |

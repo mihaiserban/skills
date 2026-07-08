@@ -99,3 +99,13 @@ After producing a primary-source brief, append a one-line entry to `.research-lo
 After the brief, continue with the user's requested planning, design, or implementation work if that is part of the same request. Preserve citations in the final answer when they materially justify a decision.
 
 If arXiv does not contain enough relevant work, broaden to other primary sources such as official papers, conference proceedings, project repositories linked from papers, or standards documents. State that arXiv was insufficient and explain what sources filled the gap.
+
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "I'll just ask the model directly" | Models hallucinate citations, misremember methodology, and fabricate benchmark numbers. Primary sources ground you. |
+| "This topic is too new for arXiv" | Preprints hit arXiv within days. If truly too new, conference proceedings and project repos fill the gap. |
+| "I just need a quick summary, not full papers" | The abstract lies. Method sections, figures, and ablations tell you what the abstract omits. |
+| "5 papers is too many to read" | You're not reading cover-to-cover. Skim for method, results, limitations. 5 papers = 15 minutes. |
+| "I'll just cite the first Google result" | The first result is popularity, not relevance. Collect ≥5 candidates, then filter on quality. |

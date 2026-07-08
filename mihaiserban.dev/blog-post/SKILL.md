@@ -60,6 +60,16 @@ Posts go in the blog repo at `~/code/personal/projects/mihaiserban.dev/content/b
 - Only write one post per invocation. If the session contains material for multiple posts, ask which to write first.
 - Do not fabricate evidence. If a claim wasn't demonstrated in the session, don't include it.
 
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "This session wasn't blog-worthy" | Small insights compound. A pattern you noticed, a problem you solved, a decision you made — write it while it's fresh. |
+| "I'll write it up when the work is fully complete" | The best posts are written from active context. By "completion," the details have faded. |
+| "I don't have enough material for a full post" | A 300-word post with one concrete insight beats 3000 words of filler. The blog rewards precision, not length. |
+| "Nobody reads blog posts about this kind of work" | The audience is future-you. Blog posts are cached reasoning you can link to instead of re-explaining. |
+| "Writing takes too long, I have other things to do" | Structured workflow + frontmatter template = 15 minutes. You'll spend longer re-explaining the same thing next week. |
+
 ## Output
 
 A single `.md` file in the blog repo with valid frontmatter, written in the blog's voice and structure. Inform the user of the path and whether it's ready to commit.

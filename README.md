@@ -61,6 +61,7 @@ our skills plus included vendored skills.
 | `/sql-review` | Model | Auto-invoked | Review SQL and ORM queries for correctness, safety, and performance |
 | `/governance-fanout` | Model | Auto-invoked | Fan out independent sub-jobs across fresh-context workers using file-based task specs |
 | `/systematic-debugging` | Model | Auto-invoked | Reproduce-then-isolate before proposing a fix — no guessing |
+| `/using-skills` | Model | Auto-invoked | Discover which skill applies to the current task |
 
 ### User-invoked skills
 
@@ -99,6 +100,7 @@ our skills plus included vendored skills.
 | `/systematic-debugging` | ANY bug, test failure, crash, or unexpected behavior |
 | `/bisect-regression` | A bug appeared between two known commits |
 | `/revert-surgical` | A specific commit needs to be undone without reverting the whole PR |
+| `/using-skills` | Starting a session or deciding which skill to apply |
 
 ## DESIGN.md Catalog
 

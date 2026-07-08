@@ -17,3 +17,13 @@ Done when: every section is filled with concrete detail (no "TBD"), the tradeoff
 - Vague "why": "better performance" without the metric and the benchmark is a guess. Name the constraint (e.g. "500ms page load with 10K records").
 - Straw-man options: listing candidates you'd never pick to make the real choice look better. Only list genuine runners-up.
 - Hard-to-reverse choices (schema, auth, data store, language) MUST get an ADR. Skip it for reversible ones like a library swap with a clean interface.
+
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "The decision is obvious" | "Obvious" depends on context. The next engineer won't have your context — that's what the ADR provides. |
+| "I'll write it up after the PR merges" | Decisions fade from memory. Write the ADR while the tradeoffs are still sharp in your mind. |
+| "A one-line commit message is enough" | Commit messages explain WHAT. ADRs explain WHY — the constraints, the rejected options, the consequences. |
+| "Nobody reads ADRs" | The engineer debugging a design flaw 6 months from now will. ADRs are for explaining why the obvious fix is wrong. |
+| "This library swap is reversible, skip the ADR" | Correct — for cleanly-abstracted dependencies, skip. For anything that touches schema, data, or auth: write it. |

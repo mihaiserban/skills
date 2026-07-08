@@ -34,6 +34,16 @@ The single most expensive agent failure: seeing an error and immediately generat
   random attempts.
 - Never add a workaround you don't understand.
 
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "I've seen this error before, I know the fix" | The stack trace tells you WHICH variable is null, not just that something is. Same symptom, different cause. |
+| "Let me try a few things and see what sticks" | Changing multiple things means you don't know which one fixed it — and the others may have added new bugs. |
+| "A null check will prevent this crash" | That hides the root cause. The underlying bug resurfaces differently — a silent data corruption instead of a crash. |
+| "I'll just check the logs and figure it out" | Logs show symptoms, not causes. Reproduce it first, then use logs to confirm the hypothesis. |
+| "The fix is obvious, I don't need to reproduce" | "I think this fixes it" is gambling. Without reproduction, you can't verify. |
+
 ## Output
 
 End with: the root cause (one sentence), the minimal fix, and the test that now proves it.

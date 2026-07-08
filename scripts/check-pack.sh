@@ -4,6 +4,10 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
+VENDOR_SKILL_EXCLUSIONS=(
+  "vendor/agent-skills/skills/using-agent-skills"
+)
+
 fail() {
   echo "error: $*" >&2
   exit 1
@@ -39,6 +43,11 @@ included_skills=("${published_skills[@]}")
 for vendor_skills_dir in vendor/*/skill*/; do
   [ -d "$vendor_skills_dir" ] || continue
   while IFS= read -r line; do
+    skip=false
+    for excl in "${VENDOR_SKILL_EXCLUSIONS[@]}"; do
+      [ "$line" = "$excl" ] && skip=true && break
+    done
+    [ "$skip" = true ] && continue
     included_skills+=("$line")
   done < <(
     find "$vendor_skills_dir" -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
@@ -125,6 +134,7 @@ fi
 
 rg -n "init-agent-harness|\\.agents/skills/design-md-style|design-md-style-(picker|apply|audit)/scripts|grill-with-docs|improve-codebase-architecture" \
   --glob '!**/.git/**' \
+  --glob '!vendor/**' \
   --glob '!scripts/check-pack.sh' \
   . && fail "stale references found"
 

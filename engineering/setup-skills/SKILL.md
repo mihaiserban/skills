@@ -123,3 +123,13 @@ Tell the user the setup is complete and which engineering skills will now read f
 - Don't overwrite user edits to the surrounding sections when updating an existing `## Agent skills` block.
 - Assume the user does not know what these terms mean — front-load each decision with a short explainer.
 - If and only if the user picks GitHub, ask the PRs-as-request-surface follow-up. Don't ask it for local markdown or other trackers.
+
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "I'll set up later, let me just start coding" | Other engineering skills assume setup is done. Without it, issue tracking, triage, and domain docs are undefined. |
+| "My repo is small, I don't need all this configuration" | Small repos grow. Setting up now costs 5 minutes; retrofitting later costs 30. |
+| "I know my domain, I don't need CONTEXT.md" | The next contributor (including future-you in 6 months) doesn't. The glossary is for them. |
+| "GitHub Issues is the only tracker I use, no need to configure" | Configuration codifies the choice on disk so skills can read it. Implicit defaults break when tools change. |
+| "I'll write the label vocabulary when I actually need to triage an issue" | Triage happens when firefighting. Pre-configured labels let you triage without thinking about label naming. |

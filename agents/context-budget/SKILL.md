@@ -10,3 +10,13 @@ More context is not better. Past a threshold, accuracy falls off a cliff (contex
 - **Drop dead context** — once a sub-task is done, its detail leaves the window. Keep the decision, drop the trace.
 - **State on disk, not in context** — progress goes to a file the next turn re-reads, not into an ever-growing prompt.
 A bloated standing context (CLAUDE.md) taxes every single turn. Trim weekly. If the agent is confidently wrong, suspect the context before the model.
+
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "More context is always better" | Past a threshold, accuracy falls off a cliff. The model pays equal attention to noise and signal. |
+| "I'll trim the standing context later" | Context bloat is cumulative. A 200-line AGENTS.md that grows unchecked taxes every single turn. |
+| "I need the full file to understand the code" | You need the relevant function, not 2000 lines of boilerplate. Read surgically. |
+| "The agent seems fine, no need to drop old context" | Context rot is invisible. The agent becomes confidently wrong, not confused — that's harder to catch. |
+| "Summarizing takes more time than just keeping everything" | Summarizing takes 30 seconds. Unwinding a hallucination caused by context rot takes 30 minutes. |

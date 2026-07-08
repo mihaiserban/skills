@@ -220,6 +220,16 @@ versions.
 - If the user says "just build it" and skips the plan, respect that — but offer
   to save the brief into `FEATURE_PLAN.md` anyway for traceability.
 
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "I already know what I want, just build it" | Wireframes catch misunderstandings before a single line of code is written. A 10-minute plan saves hours of rework. |
+| "A text plan is enough, I don't need a wireframe" | Visual layout reveals problems text hides: missing states, flow dead-ends, information hierarchy gaps. |
+| "The systems plan is overkill for a small feature" | Even small features touch state, data flow, and edge cases. Skip the plan and you discover these mid-implementation. |
+| "I'll iterate on the code, not on the plan" | Code iteration is 10x slower than plan iteration. Move decisions from code to plan while they're cheap. |
+| "This is just a prototype, no need for a plan" | Prototypes become production. A 2-minute brief in FEATURE_PLAN.md makes that transition traceable. |
+
 ## Final Response
 
 State the feature name, the selected visual language, a one-line summary of the

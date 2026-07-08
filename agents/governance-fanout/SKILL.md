@@ -44,3 +44,13 @@ Every worker confirmed completion. Synthesis agent produced final output. No wor
 - Governance drift: governance starts doing per-unit work because "it's just one more." If it touches the work, refactor into a worker.
 - Worker starvation: a worker with too broad a role recreates the context-bloat problem. One goal, one result file.
 - Result bloat: a worker returns full results in its confirmation instead of writing to file. If confirmation exceeds 3 lines, ask the worker to truncate and write to file instead.
+
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "It's faster to just do the work myself" | One context loaded with ten jobs' worth of material triggers context rot. Ten clean contexts don't. |
+| "These tasks aren't truly independent, they share context" | Shared context creates hidden dependencies. Split them explicitly — if B needs A's output, serialize. |
+| "I can synthesize the results myself, no need for a synthesis agent" | Your context is already stale from planning and delegating. A fresh synthesis agent has clean context. |
+| "A 3-line worker is overkill for this tiny task" | If the task is genuinely tiny, batch it. But if it has its own logic and state, it deserves its own context. |
+| "Writing task specs to disk is too much overhead" | Task specs are your resume of work done. When a worker's result is wrong, the spec tells you who to blame. |

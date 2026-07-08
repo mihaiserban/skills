@@ -30,6 +30,16 @@ Do not be polite. Do not propose fixes. Do not run the code. Just hunt.
 10. **Pass-by-mock** — the test mocks the exact thing it claims to verify.
 11. **Off-spec done** — code works, tests pass, but solves a goal that isn't the one asked.
 
+## Common Rationalizations
+
+| Excuse | Why it's wrong |
+|--------|---------------|
+| "I already reviewed it while writing" | Your brain sees what it expects. A hostile second pass catches what author-blindness misses. |
+| "It's a small change, not worth a full review" | Small changes cause big outages. A one-line null pointer flipped production. |
+| "The tests pass, it must be fine" | Tests pass with relaxed assertions, swallowed errors, and mock-faked results. Tests don't prove absence of shortcuts. |
+| "I don't have time for an adversarial review right now" | An adversarial pass takes 2 minutes. Unwinding a bad commit takes hours. |
+| "The code looks correct" | "Looks correct" is the enemy. Read it assuming it's broken — you'll find the cracks. |
+
 ## Output (JSON, no prose)
 
 ```json
