@@ -1,0 +1,30 @@
+{
+  "skill_name": "domain-modeling",
+  "evals": [
+    {
+      "id": 1,
+      "name": "sharpen-subscription-terminology",
+      "prompt": "We're building a subscription billing system. Here's the brief from the product manager:\n\n\"When a customer's account upgrades from the basic plan to the pro plan, we want to prorate the remaining account balance and issue an invoice. If the account downgrades, we should hold the credit on the account and apply it to future invoices. Also, when an account cancels, we need to know if it's a soft cancel or a hard cancel. Soft-cancelled accounts keep access until the end of the billing period; hard-cancelled accounts lose access immediately.\"\n\nThere is no existing CONTEXT.md in the repo. Help me model this domain. I need precise terminology and a glossary.",
+      "files": [],
+      "assertions": [
+        {"id": "challenges-ambiguous-account", "text": "Challenges the overloaded term 'account' and distinguishes Customer vs Subscription", "type": "quality"},
+        {"id": "challenges-plan-tier", "text": "Sharpens fuzzy 'plan' / 'pro plan' / 'basic plan' language into canonical terms", "type": "quality"},
+        {"id": "defines-credit-balance", "text": "Defines a canonical term for the prorated credit held on the account", "type": "quality"},
+        {"id": "distinguishes-cancellation-types", "text": "Distinguishes soft cancellation from hard cancellation with precise definitions", "type": "quality"},
+        {"id": "updates-context-md", "text": "Proposes or writes a root CONTEXT.md glossary with the resolved terms", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "record-event-sourcing-adr",
+      "prompt": "We just made an architectural decision for the ordering service. Instead of keeping the latest order state in a Postgres row and updating it in place, we decided to store every change to an order as an immutable event in an append-only log. We'll replay events to reconstruct state and project read models.\n\nWe considered just updating the Postgres row (simpler, familiar, but loses history), but chose event sourcing because the finance and support teams need a complete audit trail of every order change. Once live orders are in the event store, switching back to a single-row model would require a difficult migration and we'd lose the audit guarantee.\n\nShould we record this as an ADR? If yes, write it. If no, explain why not.",
+      "files": [],
+      "assertions": [
+        {"id": "offers-adr", "text": "Offers to create an ADR because the decision is hard to reverse, surprising, and a real trade-off", "type": "quality"},
+        {"id": "checks-three-criteria", "text": "Checks all three ADR criteria: hard to reverse, surprising without context, result of a real trade-off", "type": "quality"},
+        {"id": "adr-path", "text": "Creates or proposes docs/adr/0001-event-sourcing-orders.md", "type": "format"},
+        {"id": "records-decision", "text": "The ADR records what was decided and why event sourcing was chosen over the Postgres-row alternative", "type": "quality"}
+      ]
+    }
+  ]
+}

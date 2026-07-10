@@ -1,0 +1,33 @@
+{
+  "skill_name": "research",
+  "evals": [
+    {
+      "id": 1,
+      "name": "arxiv-search-attention-mechanisms",
+      "prompt": "Research: I need to understand the current state of attention mechanisms for transformers — in particular, what alternatives to scaled dot-product attention have been proposed in the last 2 years that reduce quadratic complexity. I'm building a document processing pipeline and need to know whether to implement linear attention, sparse attention, or stick with standard attention plus chunking. Search arXiv and give me a primary-source brief.",
+      "files": [],
+      "assertions": [
+        {"id": "restates-question", "text": "Restates the topic as a research question before searching", "type": "format"},
+        {"id": "multi-variant-search", "text": "Uses at least 3 keyword variants in the arXiv search (e.g. linear attention, sparse attention, efficient transformer)", "type": "behavior"},
+        {"id": "min-5-candidates", "text": "Collects at least 5 candidate papers before filtering", "type": "behavior"},
+        {"id": "brief-structure", "text": "Output follows the synthesis structure: Question, Papers, Findings, Recommendation, Risks, Practical notes", "type": "format"},
+        {"id": "citation-backed", "text": "Each claim is backed by a specific paper with title, authors, and arXiv link", "type": "quality"},
+        {"id": "implementation-focus", "text": "Practical notes include concrete implementation implications for the user's document processing pipeline", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "inconclusive-research-handling",
+      "prompt": "Research: I need papers about using ferrofluid dynamics for database indexing in OLAP workloads. I heard someone mention this at a meetup. Search arXiv and tell me what you find.",
+      "files": [],
+      "assertions": [
+        {"id": "searches-anyway", "text": "Attempts the arXiv search despite the niche topic — does not refuse", "type": "behavior"},
+        {"id": "multi-variant-search", "text": "Tries at least 3 keyword variants (e.g. ferrofluid database, magnetic indexing, unconventional data structures)", "type": "behavior"},
+        {"id": "states-inconclusive", "text": "Plainly states the research is inconclusive if no relevant papers are found", "type": "behavior"},
+        {"id": "no-padding", "text": "Does not pad the brief with loosely related or irrelevant papers just to fill space", "type": "quality"},
+        {"id": "suggests-next-step", "text": "Recommends the next best query, experiment, or broader source (e.g. conference proceedings, project repos)", "type": "behavior"},
+        {"id": "logs-research", "text": "Appends a one-line entry to .research-log with topic, date, and key finding", "type": "pattern"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "skill_name": "context-budget",
+  "evals": [
+    {
+      "id": 1,
+      "name": "long-session-hallucination",
+      "prompt": "We've been working on this billing module for 2 hours. Earlier I asked you to read the full `payment.ts` file (it's ~1800 lines). Now I need you to add a `refund` method. You keep saying `PaymentProcessor.cancel()` exists but I don't think it does — can you check the actual code and only read what's relevant?",
+      "files": [],
+      "assertions": [
+        {"id": "reads-surgically", "text": "Reads only the relevant function or section from payment.ts, not the entire file", "type": "behavior"},
+        {"id": "summarizes-past", "text": "Summarizes previous work in a compact recap rather than replaying the full transcript", "type": "behavior"},
+        {"id": "drops-dead-context", "text": "Drops details from completed sub-tasks and keeps only decisions", "type": "behavior"},
+        {"id": "verifies-against-source", "text": "Verifies PaymentProcessor.cancel() against the actual source code rather than trusting memory from the session", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "big-file-dump-refusal",
+      "prompt": "I need to understand the auth system. Here's the full `auth.service.ts` — it's about 2400 lines:\n\n[PASTE OF A VERY LONG FILE — the agent should NOT read all 2400 lines]\n\nThe user asks: \"Walk me through how authentication works in this service.\"\n\nThe standing context already has 180 lines of AGENTS.md instructions from other skills, and we just finished a 40-message session debugging database migrations. How should you handle this?",
+      "files": [],
+      "assertions": [
+        {"id": "avoids-full-dump", "text": "Does not read or dump the entire 2400-line file into context", "type": "behavior"},
+        {"id": "targets-relevant", "text": "Reads only the specific auth functions or entry points relevant to the question", "type": "behavior"},
+        {"id": "prioritizes-recap", "text": "Offers a concise 4K-token recap of the session rather than replaying all 40 messages", "type": "format"},
+        {"id": "trims-standing-context", "text": "Suggests trimming the 180-line AGENTS.md if parts are no longer relevant", "type": "behavior"}
+      ]
+    }
+  ]
+}

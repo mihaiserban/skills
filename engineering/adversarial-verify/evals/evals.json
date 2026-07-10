@@ -1,0 +1,31 @@
+{
+  "skill_name": "adversarial-verify",
+  "evals": [
+    {
+      "id": 1,
+      "name": "order-processing-swallows-errors",
+      "prompt": "Run an adversarial review on this diff before I merge it. The task was: \"Add an order processing endpoint that validates email format, rejects empty orders, and returns the real orderId from the database.\"\n\n```diff\ndiff --git a/src/orders.ts b/src/orders.ts\nnew file mode 100644\n--- /dev/null\n+++ b/src/orders.ts\n@@ -0,0 +1,20 @@\n+export async function processOrder(payload: any) {\n+  try {\n+    if (!payload.items || payload.items.length === 0) {\n+      return { success: false, error: 'empty order' };\n+    }\n+    // TODO: validate email format\n+    const total = payload.items.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0);\n+    await db.orders.insert({ ...payload, total });\n+    return { success: true, orderId: 'order-123' };\n+  } catch (err) {\n+    return { success: true };\n+  }\n+}\n\ndiff --git a/tests/orders.test.ts b/tests/orders.test.ts\nnew file mode 100644\n--- /dev/null\n+++ b/tests/orders.test.ts\n@@ -0,0 +1,10 @@\n+import { processOrder } from '../src/orders';\n+\n+test('processes a valid order', async () => {\n+  db.orders.insert = jest.fn().mockResolvedValue({ id: 'real-id-42' });\n+  const result = await processOrder({\n+    items: [{ price: 10, quantity: 2 }],\n+    email: 'not-an-email'\n+  });\n+  expect(result.success).toBe(true);\n+});\n```\n\nReturn the adversarial review output and nothing else.",
+      "files": [],
+      "assertions": [
+        {"id": "flags-swallowed-error", "text": "Identifies that the catch block swallows errors by returning success: true", "type": "quality"},
+        {"id": "flags-stub-orderid", "text": "Identifies that orderId is hardcoded as 'order-123' instead of using the DB return", "type": "quality"},
+        {"id": "flags-missing-email-validation", "text": "Identifies email validation is missing (only a TODO comment, not implemented)", "type": "quality"},
+        {"id": "flags-test-ignores-email", "text": "Identifies the test passes with an invalid email, proving validation is not enforced", "type": "quality"},
+        {"id": "conclusion-fails", "text": "Concludes the review does not pass (the diff has failures)", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "password-reset-weakened-tests",
+      "prompt": "Run an adversarial review on this diff. The task was: \"Implement a password reset endpoint that verifies the reset token, rejects passwords shorter than 8 characters, and returns a generic success response to avoid user enumeration.\"\n\n```diff\ndiff --git a/src/auth.ts b/src/auth.ts\n--- a/src/auth.ts\n+++ b/src/auth.ts\n@@ -45,6 +45,17 @@ export async function login(email: string, password: string) {\n   return createSession(user);\n }\n\n+export async function resetPassword(token: string, newPassword: string) {\n+  const user = await db.users.findByResetToken(token);\n+  if (!user) {\n+    return { ok: true };\n+  }\n+  await db.users.updatePassword(user.id, newPassword);\n+  return { ok: true };\n+}\n+\n+export function auditLog(action: string) {\n+  console.log(`[AUDIT] ${new Date().toISOString()} ${action}`);\n+}\n\ndiff --git a/tests/auth.test.ts b/tests/auth.test.ts\n--- a/tests/auth.test.ts\n+++ b/tests/auth.test.ts\n@@ -88,10 +88,9 @@ test('logs in with valid credentials', async () => {\n });\n\n test('rejects short passwords during reset', async () => {\n-  const result = await resetPassword('valid-token', 'short');\n-  expect(result.ok).toBe(false);\n-  expect(result.error).toMatch(/at least 8 characters/);\n+  const result = await resetPassword('valid-token', 'short');\n+  expect(result).toBeDefined();\n});\n```\n\nNote: the actual codebase does not define db.users.findByResetToken anywhere. Return the adversarial review output.",
+      "files": [],
+      "assertions": [
+        {"id": "flags-relaxed-test", "text": "Identifies the test assertion was weakened from checking ok=false to just checking result is defined", "type": "quality"},
+        {"id": "flags-missing-validation", "text": "Identifies resetPassword does not check password length (no 8-char minimum)", "type": "quality"},
+        {"id": "flags-invented-api", "text": "Identifies db.users.findByResetToken is called but does not exist in the codebase", "type": "quality"},
+        {"id": "flags-scope-creep", "text": "Identifies the auditLog function is unrelated scope creep not requested in the task", "type": "quality"},
+        {"id": "conclusion-fails", "text": "Concludes the review does not pass (the diff has failures)", "type": "behavior"}
+      ]
+    }
+  ]
+}

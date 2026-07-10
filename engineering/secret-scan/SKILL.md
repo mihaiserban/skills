@@ -6,10 +6,15 @@ when_to_use: before commit, files with API keys, .env handling, config, connecti
 # Secret Scan
 Grep the diff for: `api[_-]?key`, `secret`, `token`, `password`, `BEGIN PRIVATE KEY`, `AKIA[0-9A-Z]{16}`, `sk-`, `ghp_`, bearer values, and long base64/hex blobs.
 For each hit: is it a real secret or a placeholder? Real secrets:
-1. Must move to env / a secrets manager — never the repo.
-2. If already committed, it is COMPROMISED. Rotate it, don't just delete the line.
-3. Add the pattern to `.gitignore` / a pre-commit secret scanner.
-Output: file:line of every real secret + the rotation step. A deleted secret in git history is still leaked.
+1. **Move it** — to env vars or a secrets manager. Never the repo. Say: "Move this to an environment variable."
+2. **Rotate it** — if already committed, it is COMPROMISED. Say: "Rotate this key now — it's in git history." Deleting the line doesn't help.
+3. **Prevent recurrence** — add the pattern to `.gitignore` or a pre-commit secret scanner.
+Output format: for each real secret, print `file:line — SECRET TYPE — Action: <move|rotate|prevent>`. End with a one-line summary: "N secrets found. M need rotation."
+
+## What to say explicitly
+- If a secret is committed: **"ROTATE immediately — it's in the reflog."**
+- If a secret is in a config file: **"Move to environment variable: KEY_NAME"**
+- If a secret looks like a test/mock: **"Treat as live — test keys often grant real staging access."**
 
 ## Common Rationalizations
 

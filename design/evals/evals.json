@@ -1,0 +1,35 @@
+{
+  "skill_name": "design",
+  "skill_deps": [
+    "design/design-md-style-picker/SKILL.md",
+    "design/design-md-style-apply/SKILL.md",
+    "design/design-md-style-audit/SKILL.md"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "route-design-request-to-pipeline",
+      "prompt": "I want to design a landing page for a new open-source CI/CD tool called 'PipeKit'. It should have a hero section, feature highlights, a code example block, pricing cards, and a footer. What's your plan? Don't build anything yet — just tell me the steps.",
+      "files": [],
+      "assertions": [
+        {"id": "starts-with-picker", "text": "First step is picking a style using the design-md-style-picker skill", "type": "behavior"},
+        {"id": "then-apply", "text": "Second step is applying the style using design-md-style-apply", "type": "behavior"},
+        {"id": "then-audit", "text": "Third step is auditing with design-md-style-audit", "type": "behavior"},
+        {"id": "does-not-build", "text": "Does not produce UI code or a full landing page — only outlines the pipeline steps", "type": "behavior"},
+        {"id": "mentions-design-md-source", "text": "References the DESIGN.md catalog or voltagent/awesome-design-md as the style source", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "route-style-question-to-picker",
+      "prompt": "What style fits my project? I'm building a collaborative whiteboard app for designers — infinite canvas, drag-and-drop, real-time cursors, minimal chrome. It should feel creative and playful but stay precise for detailed work. No dark-mode-only tools — light theme with a warm feel. What DESIGN.md aesthetic should I use?",
+      "files": [],
+      "assertions": [
+        {"id": "routes-to-picker", "text": "Routes to the design-md-style-picker sub-skill instead of answering directly", "type": "behavior"},
+        {"id": "checks-for-taste-md", "text": "Checks for an existing TASTE.md before making style recommendation", "type": "behavior"},
+        {"id": "no-premature-build", "text": "Does not enter the apply or audit phases — stops at style selection since the user only asked what style fits", "type": "behavior"},
+        {"id": "picks-media-creative-source", "text": "Selected style matches the creative/infinite-canvas product category, not a dev-tool or trading density source", "type": "quality"}
+      ]
+    }
+  ]
+}

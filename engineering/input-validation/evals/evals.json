@@ -1,0 +1,31 @@
+{
+  "skill_name": "input-validation",
+  "evals": [
+    {
+      "id": 1,
+      "name": "register-handler-missing-validation",
+      "prompt": "Review this registration handler. It accepts untrusted JSON from a public API. What's wrong and how should I fix it?\n\n```typescript\n// src/routes/register.ts\napp.post('/register', async (req, res) => {\n  const user = await db.users.create(req.body);\n  return { id: user.id };\n});\n```\n\nExpected registration fields: `email` (valid email), `password` (8-128 characters), `name` (1-100 characters, non-empty). Unknown fields should be rejected. Return a 400 with a clear error message on failure.",
+      "files": [],
+      "assertions": [
+        {"id": "validates-email", "text": "Validates email format before touching logic or storage", "type": "quality"},
+        {"id": "validates-password-bounds", "text": "Validates password length (8-128 characters)", "type": "quality"},
+        {"id": "validates-name", "text": "Validates name is non-empty and within length bounds (1-100)", "type": "quality"},
+        {"id": "rejects-unknown-fields", "text": "Rejects unknown fields instead of silently dropping them", "type": "quality"},
+        {"id": "returns-400", "text": "Returns a 4xx status with a clear, non-leaky error message", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "file-upload-path-traversal",
+      "prompt": "This file upload endpoint takes a file from a multipart form. Point out the validation gaps.\n\n```typescript\n// src/routes/upload.ts\napp.post('/upload', async (req, res) => {\n  const { file } = req.body;\n  const path = `./uploads/${file.name}`;\n  await fs.writeFile(path, file.data);\n  return { path };\n});\n```\n\nRequirements: max file size 5 MB, allowlist only image/png and image/jpeg (verify by content/MIME type, not extension), reject filenames that try path traversal. Return 400 with a clear reason.",
+      "files": [],
+      "assertions": [
+        {"id": "validates-size", "text": "Validates file size against a 5 MB limit", "type": "quality"},
+        {"id": "validates-type-by-content", "text": "Validates file type by content/MIME type, not just extension", "type": "quality"},
+        {"id": "prevents-path-traversal", "text": "Prevents path traversal in filenames", "type": "quality"},
+        {"id": "allowlist-not-blacklist", "text": "Uses an allowlist for allowed types rather than a blacklist", "type": "quality"},
+        {"id": "returns-400", "text": "Returns a 4xx status with a clear error message and no internal details", "type": "behavior"}
+      ]
+    }
+  ]
+}

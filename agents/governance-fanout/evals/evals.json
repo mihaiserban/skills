@@ -1,0 +1,30 @@
+{
+  "skill_name": "governance-fanout",
+  "evals": [
+    {
+      "id": 1,
+      "name": "fan-out-5-independent-tasks",
+      "prompt": "I need to audit 5 services for security issues: auth-service, payment-service, user-service, notification-service, and gateway-service. Each has its own directory under `services/`. For each one, I need: a list of unvalidated inputs, missing auth checks, and hardcoded secrets. All five are independent — they don't depend on each other. Give me a combined audit report.",
+      "files": [],
+      "assertions": [
+        {"id": "creates-task-specs", "text": "Creates a task spec YAML for each of the 5 services under .agent-state/tasks/", "type": "format"},
+        {"id": "spawns-workers", "text": "Spawns a worker per service, each with only its task spec and relevant context files", "type": "behavior"},
+        {"id": "governance-does-no-work", "text": "Governance does not read service source files or perform per-unit audit work itself", "type": "behavior"},
+        {"id": "collects-confirmations", "text": "Collects short confirmations from workers without reading result files into context", "type": "behavior"},
+        {"id": "synthesis-agent", "text": "Spawns a fresh synthesis agent to read all .agent-state/results/*.yaml and produce the combined report", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "serialize-dependent-tasks",
+      "prompt": "I have two tasks: (1) generate database migration files for a new `audit_log` table, and (2) write the ORM model class that maps to that table. Task 2 depends on task 1 — the model needs the column definitions from the migration. Plan and execute this.",
+      "files": [],
+      "assertions": [
+        {"id": "detects-dependency", "text": "Recognizes task 2 depends on task 1 and marks task 2 with blocked_on in its task spec", "type": "quality"},
+        {"id": "fans-out-phase-1", "text": "Fans out task 1 (migration) first, waits for completion before spawning task 2", "type": "behavior"},
+        {"id": "does-not-parallelize", "text": "Does not spawn task 2 worker in parallel with task 1", "type": "behavior"},
+        {"id": "separate-contexts", "text": "Task 2 worker receives task 1's result file path in context_files, not its full output", "type": "format"}
+      ]
+    }
+  ]
+}

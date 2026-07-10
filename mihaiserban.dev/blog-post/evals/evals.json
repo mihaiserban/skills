@@ -1,0 +1,31 @@
+{
+  "skill_name": "blog-post",
+  "evals": [
+    {
+      "id": 1,
+      "name": "conversation-to-blog-post",
+      "prompt": "Turn this session into a blog post.\n\nSummary: We migrated our CI pipeline from GitHub Actions self-hosted runners to a hybrid setup where heavy builds run on AWS spot instances and lightweight checks stay on GitHub-hosted runners. Key decisions: used Packer to bake AMIs with pre-warmed Docker layers, brought build times from 14 minutes to 3 minutes, and saved ~$400/month by eliminating always-on runners. The pattern we discovered: pre-warming the build environment is cheaper than keeping runners alive. We hit one snag where spot instance termination left dangling build artifacts in S3 — solved with a lifecycle policy that expires incomplete uploads after 1 hour.",
+      "files": [],
+      "assertions": [
+        {"id": "valid-frontmatter", "text": "Output Markdown file has valid frontmatter with slug, title, description, date, hidden, and tags fields", "type": "format"},
+        {"id": "first-person-voice", "text": "Written in first-person conversational tone, not third-person documentation style", "type": "format"},
+        {"id": "section-separators", "text": "Uses --- horizontal rules to separate major sections", "type": "format"},
+        {"id": "hook-opens", "text": "Opens with the problem or motivation, not warm-up fluff", "type": "format"},
+        {"id": "bottom-line-closes", "text": "Ends with a \"Bottom line\" or \"What's next\" section", "type": "pattern"},
+        {"id": "concrete-evidence", "text": "Includes concrete numbers from the session (14→3 min, $400/month savings)", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "insufficient-material-decline",
+      "prompt": "Turn this session into a blog post.\n\nSummary: We chatted about what IDE themes we like. I prefer dark themes with high contrast. We talked about Dracula, One Dark Pro, and Catppuccin. That was pretty much the whole session.",
+      "files": [],
+      "assertions": [
+        {"id": "declines-gracefully", "text": "Declines to write a post because the session lacks concrete material", "type": "behavior"},
+        {"id": "explains-why", "text": "Explains that a post needs at least one of: pattern discovered, problem solved, performance numbers, architecture decision, or research findings", "type": "behavior"},
+        {"id": "no-fabrication", "text": "Does not fabricate evidence, benchmarks, or decisions that weren't in the session", "type": "quality"},
+        {"id": "no-file-written", "text": "Does not write a file to the blog repo when declining", "type": "behavior"}
+      ]
+    }
+  ]
+}

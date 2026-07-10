@@ -1,0 +1,33 @@
+{
+  "skill_name": "design-taste-distiller",
+  "evals": [
+    {
+      "id": 1,
+      "name": "distill-references-into-taste",
+      "prompt": "Capture my design preferences into a TASTE.md. Here are my references:\n\n1. I love how Linear feels — dense, keyboard-first, no decoration. Everything has a reason.\n2. My current app feels 'too generic AI design' — centered hero, three cards, gradient buttons. I hate that.\n3. I want precision over personality. Typography should carry the brand, not decorative effects.\n4. For dashboards: information hierarchy before visual drama. For landing pages: one strong visual thesis, not five competing CTAs.\n5. I keep going back to Stripe's documentation — the way they use color deliberately, one accent per page, generous whitespace between sections.\n6. Anti-pattern: never use purple-to-pink gradients. Never use emoji as icons. Never use glassmorphism.\n\nDistill this into TASTE.md.",
+      "files": [],
+      "assertions": [
+        {"id": "taste-md-structure", "text": "Output follows TASTE.md structure with Product Context, Taste Values, Anti-Patterns, Decision Rules, Critique Questions, and Execution Dials sections", "type": "format"},
+        {"id": "includes-anti-patterns", "text": "Anti-Patterns section captures the user's explicit negatives: purple-to-pink gradients, emoji icons, glassmorphism", "type": "quality"},
+        {"id": "includes-decision-rules", "text": "Decision Rules section includes falsifiable rules like 'one accent per page' and 'typography carries brand'", "type": "quality"},
+        {"id": "captures-user-voice", "text": "Retains user's strong phrasing (e.g. 'too generic AI design') in quotes or direct references", "type": "quality"},
+        {"id": "positive-references-present", "text": "Positive References section names Linear, Stripe documentation as aspirational sources", "type": "format"},
+        {"id": "compact-1-to-3-pages", "text": "Output is compact — uses bullets and short imperatives, avoids long theory paragraphs", "type": "format"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "distill-from-feedback-and-screenshots",
+      "prompt": "I've been iterating on a SaaS analytics dashboard and I keep giving the same feedback. Distill my critique into TASTE.md so I stop repeating myself:\n\nFeedback I've given across 3 review rounds:\n- 'The sidebar is too wide — it's eating 30% of the screen. Make it 240px max.'\n- 'Stop using different border-radius values. Pick one: 6px. Every card, button, input gets 6px.'\n- 'The data tables look like Excel. More whitespace between rows, less grid lines.'\n- 'We only need two font weights: 400 for body, 600 for headings. Drop the 500 and 700.'\n- 'Alerts should be a thin left-border accent, not a colored background pill.'\n- 'Charts should use desaturated colors with one bright accent for the highlighted data point.'\n- 'Never auto-play animations. Respect prefers-reduced-motion.'\n\nMode preferences:\n- When I ask for a new page, show me the layout wireframe first, then build.\n- When I ask for a design review, audit against TASTE.md before suggesting changes.\n- When we're close to shipping, only fix P1 issues — no more polish passes.\n\nWrite TASTE.md.",
+      "files": [],
+      "assertions": [
+        {"id": "taste-md-structure", "text": "Output follows TASTE.md structure with Product Context, Taste Values, Anti-Patterns, Decision Rules, and Execution Dials sections", "type": "format"},
+        {"id": "design-locks-present", "text": "Design Locks section captures explicit constraints: 240px sidebar, 6px border-radius, two font weights (400/600)", "type": "quality"},
+        {"id": "workflow-modes-present", "text": "Workflow Modes section encodes the three modes: show wireframe first, audit against TASTE.md, P1-only near shipping", "type": "quality"},
+        {"id": "mechanical-checks", "text": "Decision rules are mechanical and falsifiable — e.g. 'alerts use thin left-border accent, not colored background pill'", "type": "quality"},
+        {"id": "preflight-checks", "text": "Preflight Checks section includes prefers-reduced-motion and border-radius consistency checks", "type": "format"},
+        {"id": "playbooks-to-load", "text": "Playbooks To Load section names the relevant skills or documents for each workflow mode", "type": "format"}
+      ]
+    }
+  ]
+}

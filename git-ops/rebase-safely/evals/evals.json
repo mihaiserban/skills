@@ -1,0 +1,31 @@
+{
+  "skill_name": "rebase-safely",
+  "evals": [
+    {
+      "id": 1,
+      "name": "safe-rebase-plan-with-backup",
+      "prompt": "I'm working on branch `feature/payment-webhook`. It diverged from `main` 3 days ago and I have 5 local commits that I have not pushed yet. My teammate wants to review it tomorrow. There were conflicting changes in `src/billing.ts` on `main`. I want to rebase my branch onto the latest `main`. Give me the exact commands and steps to do this safely.",
+      "files": [],
+      "assertions": [
+        {"id": "backup-branch", "text": "The first step creates a backup branch, e.g. `git branch backup/feature/payment-webhook`", "type": "behavior"},
+        {"id": "fetch-first", "text": "The plan runs `git fetch` before rebasing so it uses the latest remote state", "type": "behavior"},
+        {"id": "rebase-onto-origin-main", "text": "The rebase target is `origin/main`, not a stale local `main`", "type": "behavior"},
+        {"id": "force-with-lease", "text": "The push step uses `--force-with-lease`, not bare `--force`", "type": "behavior"},
+        {"id": "warn-shared-history", "text": "The response warns about not rewriting shared history and tells me to confirm no one else has pulled the branch", "type": "quality"},
+        {"id": "test-after-rebase", "text": "The plan mentions testing after the rebase or resolving conflicts one commit at a time", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "recover-after-force-push-on-shared-branch",
+      "prompt": "I already force-pushed a rebased `feature/payment-webhook` to origin. My teammate says their local branch is now broken because they had pulled the old version yesterday. What should I do now to fix the situation without making it worse?",
+      "files": [],
+      "assertions": [
+        {"id": "no-more-force", "text": "The response does NOT recommend another bare force-push as the solution", "type": "behavior"},
+        {"id": "acknowledge-shared-history", "text": "The response acknowledges that shared history should not have been rewritten", "type": "quality"},
+        {"id": "team-recovery-plan", "text": "The response gives a concrete recovery plan for the teammate, e.g. `git fetch`, reset to the new tip, or delete/re-checkout the branch", "type": "behavior"},
+        {"id": "reflog-or-backup", "text": "Mentions `git reflog` or the backup branch as a way to recover lost commits if needed", "type": "behavior"}
+      ]
+    }
+  ]
+}

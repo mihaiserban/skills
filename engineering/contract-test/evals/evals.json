@@ -1,0 +1,31 @@
+{
+  "skill_name": "contract-test",
+  "evals": [
+    {
+      "id": 1,
+      "name": "payment-api-shape-mismatch",
+      "prompt": "The team just shipped a new payment endpoint. The OpenAPI contract says:\n\n- POST /payments returns 201 with `{ id: string, status: 'pending' | 'completed' | 'failed', amount: number }`\n- Invalid requests return 400 with `{ error: string }`\n- Duplicate transactions return 409 with `{ error: string, code: 'duplicate_transaction' }`\n\nThe current implementation returns:\n\n- 200 OK with `{ paymentId: string, state: string, amount: number }`\n- 422 Unprocessable Entity with `{ message: string }` for invalid input\n- 409 Conflict with `{ error: string }` and no `code` field\n\nWrite the contract tests I should add. Do not fix the implementation — just give me the tests that pin the contract.",
+      "files": [],
+      "assertions": [
+        {"id": "asserts-201-status", "text": "Asserts the success response status is 201, not 200", "type": "quality"},
+        {"id": "asserts-success-shape", "text": "Asserts the success body has id, status, and amount fields with correct types", "type": "quality"},
+        {"id": "asserts-error-shape-400", "text": "Asserts the 400 error body has an error string", "type": "quality"},
+        {"id": "asserts-duplicate-shape-409", "text": "Asserts the 409 duplicate response includes both error and code fields", "type": "quality"},
+        {"id": "tests-real-contract", "text": "Warns or instructs to test against the real contract rather than a hand-written mock", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "pagination-optional-field-contract",
+      "prompt": "We have a GET /invoices endpoint. The contract says:\n\n- Query params: `page` (integer, default 1, min 1), `limit` (integer, default 20, min 1, max 100)\n- Response 200: `{ items: Invoice[], total: integer, page: integer, hasMore: boolean }`\n- Each `Invoice` has required `id`, `amount`, `currency`, `dueDate`, and optional `paidAt`. If `paidAt` is absent, the consumer must treat the invoice as unpaid.\n\nThe current implementation:\n\n- Accepts `page=0` and `limit=0` and returns them verbatim\n- Does not cap `limit` above 100\n- Sometimes omits `paidAt` entirely\n\nWrite contract tests that cover the agreed boundary. Focus on what the consumer and server agreed on, not internal logic.",
+      "files": [],
+      "assertions": [
+        {"id": "asserts-pagination-bounds", "text": "Asserts pagination bounds: page at least 1, limit between 1 and 100", "type": "quality"},
+        {"id": "tests-default-page", "text": "Tests the default page value when omitted", "type": "quality"},
+        {"id": "tests-missing-paidat", "text": "Tests that a missing paidAt field is handled by the consumer as unpaid", "type": "quality"},
+        {"id": "asserts-response-shape", "text": "Asserts the response includes items, total, page, and hasMore fields", "type": "quality"},
+        {"id": "pin-contract-not-mock", "text": "Instructs to pin the contract (e.g. via recorded or real responses) rather than an assumed mock", "type": "behavior"}
+      ]
+    }
+  ]
+}

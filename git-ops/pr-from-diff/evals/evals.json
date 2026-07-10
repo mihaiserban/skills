@@ -1,0 +1,31 @@
+{
+  "skill_name": "pr-from-diff",
+  "evals": [
+    {
+      "id": 1,
+      "name": "backend-pr-with-verification-and-risks",
+      "prompt": "I'm opening a PR for branch `feature/auth-redis-cache`. The diff changes:\n- `src/middleware/auth.ts`: caches JWT validation results in Redis for 5 minutes instead of validating on every request.\n- `src/lib/redis.ts`: adds a new Redis connection helper using `ioredis`.\n- `tests/auth.test.ts`: adds tests for cache hit, cache miss, and Redis unavailable fallback.\n- `package.json`: adds the `ioredis` dependency.\n\nWrite the PR description for me.",
+      "files": [],
+      "assertions": [
+        {"id": "what-and-why", "text": "The PR description opens with what changed and why (problem + approach) in 2-3 sentences", "type": "quality"},
+        {"id": "bulleted-changes", "text": "Changes are listed as bullets covering the meaningful files, including the new Redis helper and the `ioredis` dependency", "type": "format"},
+        {"id": "verification-steps", "text": "Includes a 'How to verify' section with exact commands the reviewer can run (e.g., `npm test`, `npm run test:auth`, or `redis-cli`)", "type": "behavior"},
+        {"id": "risks-section", "text": "Includes a 'Risks' or 'Out of scope' section naming at least one risk, e.g. Redis unavailability or cache TTL", "type": "quality"},
+        {"id": "no-fixes-stuff", "text": "The PR title/description does not contain vague text like 'fixes stuff' or 'updates'", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "ui-pr-with-screenshots-and-split-suggestion",
+      "prompt": "I'm opening a PR for branch `feature/checkout-loading-state`. The diff is about 180 lines across:\n- `components/CheckoutButton.tsx`: redesigns the checkout button and adds a loading spinner state while payment is processing.\n- `styles/global.css`: fixes a CSS typo (`btn-primry` -> `btn-primary`) that I noticed while touching the button.\n\nWrite the PR description. Also tell me if anything should be split out into a separate PR.",
+      "files": [],
+      "assertions": [
+        {"id": "ui-screenshots", "text": "The PR description mentions or requests screenshots for the UI button/spinner change", "type": "behavior"},
+        {"id": "css-typo-separated", "text": "The CSS typo fix is either listed as a separate change or the response suggests splitting it into its own PR", "type": "quality"},
+        {"id": "verification-steps", "text": "Includes concrete verification steps the reviewer can run", "type": "behavior"},
+        {"id": "risks-or-scope", "text": "Includes a risks or out-of-scope section", "type": "quality"},
+        {"id": "split-advice", "text": "Because the diff contains an unrelated CSS fix, the response advises splitting or clearly separating it", "type": "behavior"}
+      ]
+    }
+  ]
+}

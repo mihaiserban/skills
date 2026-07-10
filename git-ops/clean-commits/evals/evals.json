@@ -1,0 +1,32 @@
+{
+  "skill_name": "clean-commits",
+  "evals": [
+    {
+      "id": 1,
+      "name": "reorder-wip-into-atomic-commits",
+      "prompt": "I have a feature branch `feature/oauth-login` that I'm about to open as a PR. The current commit history is:\n- `WIP auth stuff`\n- `fix typo in README`\n- `refactor UserService validation`\n- `add Google OAuth2 login flow`\n- `WIP tests`\n- `fix null pointer when lookup returns no user`\n\nThe actual logical changes are: (1) I refactored `UserService.validate()` into a helper in `src/users/helpers.ts`, (2) I added a Google OAuth2 login flow in `src/auth/oauth.ts`, and (3) I fixed a null pointer in `src/users/lookup.ts` when the lookup returns no user. I also had a typo fix in the README that should be squashed into the first relevant commit.\n\nTell me exactly how to clean this up into atomic commits with good messages, including the git commands I should run.",
+      "files": [],
+      "assertions": [
+        {"id": "uses-interactive-rebase", "text": "The plan uses `git rebase -i` (or equivalent interactive rebase) to reorder or squash WIP commits", "type": "behavior"},
+        {"id": "squashes-wip-and-typo", "text": "The WIP commits and the typo fix are squashed/reordered into the real logical commits, not left as standalone commits", "type": "behavior"},
+        {"id": "atomic-three-commits", "text": "The final history separates the refactor, the OAuth2 feature, and the null-pointer bug fix into three distinct commits", "type": "quality"},
+        {"id": "imperative-subjects", "text": "Commit subjects use imperative mood, e.g. 'Refactor...', 'Add...', or 'Fix...'", "type": "format"},
+        {"id": "specific-bug-message", "text": "The bug-fix commit message specifies the failing scenario (null pointer / no user), not vague text like 'fix bug'", "type": "quality"},
+        {"id": "why-in-body", "text": "At least one commit message body explains WHY the change exists, not only WHAT changed", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "split-mixed-refactor-and-behavior",
+      "prompt": "I'm about to commit a change in my working tree. The diff contains two unrelated things:\n1. Renamed `getUser()` to `findUser()` across `src/api.ts`, `src/db.ts`, `src/cache.ts`, and `src/types.ts` (pure rename, no behavior change).\n2. Changed the login retry logic in `src/auth.ts` from 3 attempts to 5 attempts with exponential backoff.\n\nI wrote the commit message 'updates'. Help me fix this before I commit so the history is useful for `git bisect` later.",
+      "files": [],
+      "assertions": [
+        {"id": "split-into-two-commits", "text": "The response instructs me to create two separate commits: one for the rename refactor and one for the retry behavior change", "type": "behavior"},
+        {"id": "no-vague-message", "text": "Neither final commit message is vague like 'updates', 'fix stuff', or 'changes'", "type": "quality"},
+        {"id": "rename-specific", "text": "The refactor commit message explicitly mentions renaming `getUser()` to `findUser()`", "type": "format"},
+        {"id": "behavior-specific", "text": "The behavior commit message states the retry change (3 to 5 attempts) and mentions exponential backoff", "type": "format"},
+        {"id": "imperative-mood", "text": "Both commit subjects use imperative mood", "type": "format"}
+      ]
+    }
+  ]
+}

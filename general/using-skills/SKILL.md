@@ -33,7 +33,7 @@ Task arrives
     │   └── Browser runtime bug? ─────────→ vendor/agent-skills/skills/browser-testing-with-devtools
     │
     ├── Writing or changing code? ─────────→
-    │   ├── Deeply nested logic? ─────────→ engineering/reduce-nesting
+    │   ├── Deeply nested logic? ─────────→ (use early returns + guard clauses natively)
     │   ├── Dead or unused code? ─────────→ engineering/kill-dead-code
     │   ├── User/external input involved? → engineering/input-validation
     │   ├── Credentials in the diff? ─────→ engineering/secret-scan
@@ -88,6 +88,7 @@ Task arrives
     ├── First time in this repo? ─────────→ engineering/setup-skills
     │
     ├── Evaluating or comparing a skill? ──→ general/skill-evaluation
+    ├── Running runtime evals on a skill? → general/skill-eval-runner
     │
     ├── Writing a blog post? ─────────────→ mihaiserban.dev/blog-post
     │
@@ -164,7 +165,6 @@ Every change must clear the gates in `references/definition-of-done.md`:
 | Design | `/design-taste-distiller` | Distill references into a TASTE.md |
 | Build | `/input-validation` | Validate untrusted input at the boundary |
 | Build | `/kill-dead-code` | Find and remove unreachable code |
-| Build | `/reduce-nesting` | Flatten deeply nested conditionals |
 | Build | `/secret-scan` | Catch hardcoded secrets before commit |
 | Build | `/sql-review` | Review SQL for correctness, safety, performance |
 | Build | `/contract-test` | Test system boundaries by the contract |
@@ -203,7 +203,8 @@ Every change must clear the gates in `references/definition-of-done.md`:
 | Ponytail | `/ponytail-debt` (vendor) | Harvest ponytail: comments into a debt ledger |
 | Ponytail | `/ponytail-gain` (vendor) | Ponytail's measured impact scoreboard |
 | Ponytail | `/ponytail-help` (vendor) | Quick-reference for all ponytail commands |
-| Meta | `/skill-evaluation` | Evaluate a skill across 4 axes |
+    | Meta | `/skill-eval-runner` | Run runtime evals — measure with/without skill impact |
+    | Meta | `/skill-evaluation` | Evaluate a skill across 4 axes |
 | Meta | `/setup-skills` | Bootstrap issue tracker, labels, domain layout |
 | Meta | `/using-agent-skills` (vendor) | (Suppressed — `/using-skills` supersedes) |
 | Personal | `/research` | Research a topic on arXiv |

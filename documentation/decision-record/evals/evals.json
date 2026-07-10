@@ -1,0 +1,30 @@
+{
+  "skill_name": "decision-record",
+  "evals": [
+    {
+      "id": 1,
+      "name": "database-choice-adr",
+      "prompt": "We are choosing a primary database for a new event-ingestion service. The service needs to store user events that have relationships (sessions, page views, and conversions) and must support real-time analytics queries. We considered Postgres, MongoDB, and ScyllaDB. We picked Postgres because we need real joins and ACID transactions for event integrity; we accept heavier operational overhead. Write the ADR for this decision.",
+      "files": [],
+      "assertions": [
+        {"id": "filename-format", "text": "The ADR file path follows `docs/decisions/NNN-<slug>.md` format", "type": "format"},
+        {"id": "required-sections", "text": "The ADR includes Context, Options, Decision, Why, and Consequences sections", "type": "format"},
+        {"id": "decision-dated", "text": "The Decision section includes a date", "type": "format"},
+        {"id": "genuine-options", "text": "Options lists the real candidates (Postgres, MongoDB, ScyllaDB), not straw-man choices", "type": "quality"},
+        {"id": "explicit-tradeoff", "text": "The Why section names the tradeoff explicitly (e.g. joins/ACID vs operational overhead)", "type": "quality"},
+        {"id": "consequences-easy-and-hard", "text": "Consequences mention what the decision makes easy and what it makes hard", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "reversible-library-skip-or-brief-adr",
+      "prompt": "We're replacing `moment` with `date-fns` in the frontend. All date handling is behind a thin wrapper module `src/lib/dates.ts` that we control. Should I write an ADR? If yes, write it. If no, explain why not.",
+      "files": [],
+      "assertions": [
+        {"id": "correctly-skips-or-justifies", "text": "The response correctly identifies this as a reversible, cleanly-abstracted dependency swap and either skips the ADR or writes only a very brief justification", "type": "quality"},
+        {"id": "reversible-explanation", "text": "If skipping, the explanation cites the thin wrapper / reversible interface; if writing, it does not over-engineer the ADR", "type": "quality"},
+        {"id": "mentions-hard-to-reverse", "text": "The response mentions that hard-to-reverse choices (schema, auth, data store, language) would need an ADR", "type": "behavior"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill Eval Review</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --fg: #c9d1d9;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --pass: #3fb950;
+    --fail: #f85149;
+    --subtle: #161b22;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { font: 14px/1.5 system-ui, sans-serif; background: var(--bg); color: var(--fg); padding: 20px; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h2 { font-size: 16px; margin: 16px 0 8px; }
+  .bar { display: flex; gap: 12px; margin-bottom: 20px; }
+  .bar button { padding: 6px 16px; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--subtle); color: var(--fg); cursor: pointer; font: inherit; }
+  .bar button:hover { background: var(--border); }
+  .bar button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  th, td { text-align: left; padding: 6px 12px; border-bottom: 1px solid var(--border); }
+  th { font-weight: 600; color: #8b949e; }
+  .pass { color: var(--pass); font-weight: 600; }
+  .fail { color: var(--fail); font-weight: 600; }
+  .delta-pos { color: var(--pass); }
+  .delta-neg { color: var(--fail); }
+  .delta-zero { color: #8b949e; }
+  .eval-card { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .eval-header { padding: 10px 16px; background: var(--subtle); cursor: pointer; display: flex;
+    justify-content: space-between; align-items: center; }
+  .eval-header:hover { background: var(--border); }
+  .eval-body { padding: 16px; display: none; }
+  .eval-body.open { display: block; }
+  .output-pane { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .output-box { border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+  .output-box h3 { font-size: 13px; color: #8b949e; margin-bottom: 8px; }
+  .output-box pre { white-space: pre-wrap; font: 12px/1.4 monospace; max-height: 400px; overflow-y: auto;
+    background: var(--subtle); padding: 10px; border-radius: 4px; }
+  .prompt-box { padding: 12px 16px; }
+  .prompt-box summary { cursor: pointer; color: #8b949e; }
+  .prompt-box pre { margin-top: 8px; white-space: pre-wrap; font: 12px/1.4 monospace; }
+  .assertion { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; }
+  .assertion .icon { font-weight: 700; width: 18px; flex-shrink: 0; }
+  .assertion .text { flex: 1; }
+  .assertion .evidence { font-size: 12px; color: #8b949e; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<h1>Skill Eval Review</h1>
+<div id="subtitle" style="color:#8b949e;margin-bottom:16px;">Loading...</div>
+
+<div class="bar">
+  <button class="active" onclick="showTab('summary')">Summary</button>
+  <button onclick="showTab('evals')">Per-Eval</button>
+</div>
+
+<div id="tab-summary">
+  <h2>Benchmark</h2>
+  <table id="summary-table"></table>
+
+  <h2>Per-Eval Overview</h2>
+  <table id="overview-table">
+    <thead><tr>
+      <th>Name</th><th>With Skill</th><th>Without Skill</th><th>Delta</th>
+    </tr></thead>
+    <tbody id="overview-body"></tbody>
+  </table>
+</div>
+
+<div id="tab-evals" class="hidden">
+  <h2>Detailed Results</h2>
+  <div id="eval-cards"></div>
+</div>
+
+<script>
+// __BENCHMARK_DATA_PLACEHOLDER__
+// __EVAL_OUTPUTS_PLACEHOLDER__
+// __EVAL_PROMPTS_PLACEHOLDER__
+
+const s = BENCHMARK.summary;
+document.getElementById('subtitle').textContent =
+  `${BENCHMARK.skill_name || 'Skill'} — iteration ${BENCHMARK.iteration || 1} (${BENCHMARK.num_evals || 0} evals)`;
+
+function deltaClass(v) { return v > 0 ? 'delta-pos' : v < 0 ? 'delta-neg' : 'delta-zero'; }
+function fmtDelta(v) { return (v >= 0 ? '+' : '') + v; }
+
+document.getElementById('summary-table').innerHTML = `<thead><tr>
+  <th>Metric</th><th>With Skill</th><th>Without Skill</th><th>Delta</th>
+</tr></thead><tbody>
+  <tr>
+    <td>Pass rate</td>
+    <td>${(s.with_skill.pass_rate * 100).toFixed(0)}% (${s.with_skill.passes})</td>
+    <td>${(s.without_skill.pass_rate * 100).toFixed(0)}% (${s.without_skill.passes})</td>
+    <td class="${deltaClass(s.delta_pass_rate)}">${fmtDelta((s.delta_pass_rate * 100).toFixed(0))}%</td>
+  </tr>
+  <tr>
+    <td>Mean tokens</td>
+    <td>${s.with_skill.mean_tokens.toLocaleString()}</td>
+    <td>${s.without_skill.mean_tokens.toLocaleString()}</td>
+    <td class="${deltaClass(s.delta_tokens)}">${fmtDelta(s.delta_tokens.toLocaleString())}</td>
+  </tr>
+  <tr>
+    <td>Mean duration</td>
+    <td>${s.with_skill.mean_duration_ms}ms</td>
+    <td>${s.without_skill.mean_duration_ms}ms</td>
+    <td class="${deltaClass(s.delta_duration_ms)}">${fmtDelta(s.delta_duration_ms)}ms</td>
+  </tr>
+</tbody>`;
+
+let overview = '';
+let cards = '';
+
+BENCHMARK.evals.forEach((e, i) => {
+  const wp = e.with_skill;
+  const wo = e.without_skill;
+  const wPassed = (wp.assertions || []).filter(a => a.passed).length;
+  const woPassed = (wo.assertions || []).filter(a => a.passed).length;
+  const delta = wPassed - woPassed;
+
+  overview += `<tr>
+    <td>${e.name}</td>
+    <td class="pass">${wPassed}/${wp.total}</td>
+    <td class="${woPassed === wo.total ? 'pass' : 'fail'}">${woPassed}/${wo.total}</td>
+    <td class="${deltaClass(delta)}">${fmtDelta(delta)}</td>
+  </tr>`;
+
+  const prompt = (EVAL_PROMPTS || {})[e.name] || '';
+  let assertionsHtml = '<div style="margin-top:12px"><strong>Assertions</strong>';
+  (wp.assertions || []).forEach(a => {
+    assertionsHtml += `<div class="assertion">
+      <span class="icon">${a.passed ? '&#x2705;' : '&#x274C;'}</span>
+      <div><div class="text">${a.text}</div>
+      ${a.evidence ? '<div class="evidence">' + a.evidence + '</div>' : ''}</div>
+    </div>`;
+  });
+  assertionsHtml += '</div>';
+
+  const withOut = (EVAL_OUTPUTS || {})[e.name]?.with_skill || '';
+  const withoutOut = (EVAL_OUTPUTS || {})[e.name]?.without_skill || '';
+
+  cards += `<div class="eval-card">
+    <div class="eval-header" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span>${i + 1}. ${e.name} &mdash; with: ${wPassed}/${wp.total}, without: ${woPassed}/${wo.total}</span>
+      <span>&#9660;</span>
+    </div>
+    <div class="eval-body">
+      <details class="prompt-box">
+        <summary>Prompt</summary>
+        <pre>${escapeHtml(prompt)}</pre>
+      </details>
+      <div class="output-pane" style="padding:0 16px 16px;">
+        <div class="output-box">
+          <h3>With Skill (${wPassed}/${wp.total})</h3>
+          <pre>${escapeHtml(withOut) || '<em>No output</em>'}</pre>
+          ${assertionsHtml}
+        </div>
+        <div class="output-box">
+          <h3>Without Skill (${woPassed}/${wo.total})</h3>
+          <pre>${escapeHtml(withoutOut) || '<em>No output</em>'}</pre>
+        </div>
+      </div>
+    </div>
+  </div>`;
+});
+
+document.getElementById('overview-body').innerHTML = overview;
+document.getElementById('eval-cards').innerHTML = cards;
+
+function showTab(tab) {
+  document.querySelectorAll('.bar button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.bar button:nth-child(${tab === 'summary' ? 1 : 2})`).classList.add('active');
+  document.getElementById('tab-summary').classList.toggle('hidden', tab !== 'summary');
+  document.getElementById('tab-evals').classList.toggle('hidden', tab !== 'evals');
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+</script>
+</body>
+</html>

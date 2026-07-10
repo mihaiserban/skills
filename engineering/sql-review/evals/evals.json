@@ -1,0 +1,71 @@
+{
+  "skill_name": "sql-review",
+  "evals": [
+    {
+      "id": 1,
+      "name": "orm-endpoint-n-plus-one-and-missing-indexes",
+      "prompt": "Review the following new endpoint and migration before it ships.\n\n```python\n# routes/orders.py\n@app.get(\"/users/{user_id}/orders\")\ndef get_user_orders(user_id: str):\n    user = db.execute(f\"SELECT * FROM users WHERE id = '{user_id}'\")\n    orders = db.execute(f\"SELECT * FROM orders WHERE user_id = '{user_id}'\")\n    result = []\n    for order in orders:\n        items = db.execute(f\"SELECT * FROM order_items WHERE order_id = {order['id']}\")\n        result.append({\"order\": order, \"items\": items})\n    return result\n```\n\nMigration:\n```sql\n-- migrations/20240607_add_orders_discount.sql\nALTER TABLE orders ADD COLUMN discount_pct INT DEFAULT 0;\n```\n\n`orders` has ~2M rows and is heavily written during peak. Neither `orders.user_id` nor `order_items.order_id` is currently indexed. List every issue with the line number and provide rewrites.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "sql-injection-parameterized",
+          "text": "Flags the raw string interpolation in the three SELECTs as SQL injection risk and rewrites them with parameterized queries / placeholders.",
+          "type": "quality"
+        },
+        {
+          "id": "n-plus-one-rewrite",
+          "text": "Identifies the per-loop `order_items` query as an N+1 and rewrites it with a single JOIN or a batched IN query.",
+          "type": "behavior"
+        },
+        {
+          "id": "missing-indexes",
+          "text": "Points out missing indexes on `orders.user_id` and `order_items.order_id` (the JOIN/WHERE columns) and suggests adding them.",
+          "type": "quality"
+        },
+        {
+          "id": "unbounded-select",
+          "text": "Notes the unbounded `SELECT *` on `orders` (a growing table with no LIMIT) and recommends adding a LIMIT or pagination.",
+          "type": "behavior"
+        },
+        {
+          "id": "migration-safety",
+          "text": "Flags the migration adding a default column on a hot 2M-row table as unsafe (can hold a long lock) and proposes a reversible split: add NULL column, backfill, then set default.",
+          "type": "quality"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "multi-write-transfer-and-index-bypass",
+      "prompt": "Review this wallet transfer code and migration for a new feature.\n\n```python\ndef transfer(sender_id: int, recipient_id: int, amount: Decimal):\n    sender = db.execute(\"SELECT balance FROM wallets WHERE user_id = %s FOR UPDATE\" % sender_id)\n    recipient = db.execute(\"SELECT balance FROM wallets WHERE user_id = %s FOR UPDATE\" % recipient_id)\n    db.execute(\"UPDATE wallets SET balance = balance - %s WHERE user_id = %s\" % (amount, sender_id))\n    db.execute(\"UPDATE wallets SET balance = balance + %s WHERE user_id = %s\" % (amount, recipient_id))\n    db.execute(\"INSERT INTO transfers (from_user, to_user, amount) VALUES (%s, %s, %s)\" % (sender_id, recipient_id, amount))\n```\n\n```sql\n-- migrations/20240608_add_transfer_index.sql\nCREATE INDEX idx_transfers_from ON transfers(from_user);\n```\n\nThere's also an existing index `idx_wallets_email` on `wallets.email`. Another endpoint runs `SELECT * FROM wallets WHERE LOWER(email) = 'foo@example.com'`. Check correctness, safety, and performance.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "sql-injection-formatting",
+          "text": "Detects SQL injection from string `%` formatting and rewrites all five queries with bound parameters.",
+          "type": "quality"
+        },
+        {
+          "id": "transaction-wrapper",
+          "text": "Flags the multi-write transfer (two SELECTs, two UPDATEs, one INSERT) as needing a transaction wrapper so a partial failure cannot corrupt balances.",
+          "type": "behavior"
+        },
+        {
+          "id": "function-wrapped-index",
+          "text": "Identifies that `LOWER(email)` bypasses the existing `idx_wallets_email` index and suggests a functional index on `LOWER(email)` or storing a normalized email column.",
+          "type": "pattern"
+        },
+        {
+          "id": "index-fit",
+          "text": "Reviews `idx_transfers_from` against actual queries and notes whether an index on `to_user` (or a composite) is also justified.",
+          "type": "quality"
+        },
+        {
+          "id": "migration-reversible",
+          "text": "Checks that the migration is reversible (includes a `DROP INDEX` down step) or flags the missing rollback.",
+          "type": "format"
+        }
+      ]
+    }
+  ]
+}

@@ -51,17 +51,18 @@ our skills plus included vendored skills.
 | `/kill-dead-code` | Model | Auto-invoked | Find and remove unreachable/unused code safely |
 | `/pr-from-diff` | Model | Auto-invoked | Write a PR description a reviewer can approve fast |
 | `/rebase-safely` | Model | Auto-invoked | Rebase, squash, or rewrite history without losing work |
-| `/reduce-nesting` | Model | Auto-invoked | Flatten deeply nested conditionals into early-return code |
+
 | `/research` | User | `disable-model-invocation` | Research a technical or scientific topic on arXiv |
 | `/secret-scan` | Model | Auto-invoked | Catch hardcoded secrets before they get committed |
-| `/setup-skills` | User | `disable-model-invocation` | Interactive bootstrap: issue tracker, triage labels, domain doc layout |
-| `/bisect-regression` | Model | Auto-invoked | Binary-search git history to find the commit that introduced a bug |
-| `/revert-surgical` | Model | Auto-invoked | Revert a specific commit cleanly without touching unrelated changes |
-| `/skill-evaluation` | Model | Auto-invoked | Evaluate a skill across 4 axes with an evidence-cited scorecard |
-| `/sql-review` | Model | Auto-invoked | Review SQL and ORM queries for correctness, safety, and performance |
-| `/governance-fanout` | Model | Auto-invoked | Fan out independent sub-jobs across fresh-context workers using file-based task specs |
-| `/systematic-debugging` | Model | Auto-invoked | Reproduce-then-isolate before proposing a fix — no guessing |
-| `/using-skills` | Model | Auto-invoked | Discover which skill applies to the current task |
+    | `/setup-skills` | User | `disable-model-invocation` | Interactive bootstrap: issue tracker, triage labels, domain doc layout |
+    | `/revert-surgical` | Model | Auto-invoked | Revert a specific commit cleanly without touching unrelated changes |
+    | `/skill-eval-runner` | Model | Auto-invoked | Run runtime evals on a skill to measure whether it improves agent behavior |
+    | `/skill-evaluation` | Model | Auto-invoked | Evaluate a skill across 4 axes with an evidence-cited scorecard |
+    | `/sql-review` | Model | Auto-invoked | Review SQL and ORM queries for correctness, safety, and performance |
+    | `/governance-fanout` | Model | Auto-invoked | Fan out independent sub-jobs across fresh-context workers using file-based task specs |
+    | `/systematic-debugging` | Model | Auto-invoked | Reproduce-then-isolate before proposing a fix — no guessing |
+    | `/bisect-regression` | Model | Auto-invoked | Binary-search git history to find the commit that introduced a bug |
+    | `/using-skills` | Model | Auto-invoked | Discover which skill applies to the current task |
 
 ### User-invoked skills
 
@@ -92,9 +93,11 @@ our skills plus included vendored skills.
 | `/kill-dead-code` | Cleanup or before a refactor |
 | `/pr-from-diff` | Opening any pull request |
 | `/rebase-safely` | Before any history rewrite |
-| `/reduce-nesting` | Functions with 3+ levels of indentation |
+
 | `/secret-scan` | Before any commit, on files with credentials |
-| `/skill-evaluation` | User asks to evaluate, rate, audit, or compare a skill |
+    | `/skill-eval-runner` | User asks to run evals, benchmark a skill, or measure skill impact |
+    | `/skill-evaluation` | User asks to evaluate, rate, audit, or compare a skill |
+    | `/skill-eval-runner` | User asks to run evals, benchmark a skill, or measure skill impact |
 | `/sql-review` | New queries, migrations, N+1 suspicions, slow endpoints |
 | `/governance-fanout` | A goal that branches into many independent pieces |
 | `/systematic-debugging` | ANY bug, test failure, crash, or unexpected behavior |
@@ -200,7 +203,11 @@ vendored submodules.
 │   ├── check-pack.sh     # validate README/manifest/skill structure
 │   ├── add-vendor.sh     # add an external skill pack as a git submodule
 │   ├── remove-vendor.sh  # remove a vendored skill pack submodule
-│   └── design_md_catalog.py # find/search awesome-design-md profiles
+    │   ├── design_md_catalog.py # find/search awesome-design-md profiles
+    │   ├── eval-runner.py       # run with/without-skill evals via opencode
+    │   ├── eval-grade.py        # grade outputs against assertions
+    │   ├── eval-aggregate.py    # aggregate into benchmark.json + HTML
+    │   └── start-evals.sh       # full pipeline: run → grade → aggregate
 ├── vendor/
 │   ├── ponytail/
 │   │   └── skills/        # git submodule, 6 external skills
@@ -227,13 +234,13 @@ vendored submodules.
 │   ├── domain-modeling/
 │   ├── input-validation/
 │   ├── kill-dead-code/
-│   ├── reduce-nesting/
-│   ├── secret-scan/
+    │   ├── secret-scan/
 │   ├── setup-skills/
 │   ├── sql-review/
 │   └── systematic-debugging/
-├── general/
-│   └── skill-evaluation/
+    ├── general/
+    │   ├── skill-eval-runner/
+    │   └── skill-evaluation/
 ├── git-ops/
 │   ├── clean-commits/
 │   ├── pr-from-diff/

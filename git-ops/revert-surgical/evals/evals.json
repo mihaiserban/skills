@@ -1,0 +1,30 @@
+{
+  "skill_name": "revert-surgical",
+  "evals": [
+    {
+      "id": 1,
+      "name": "revert-single-bad-commit-on-shared-main",
+      "prompt": "Commit `a1b2c3d` added a new rate-limiter to `src/api/middleware.ts`. It is now rejecting legitimate traffic in production. The branch `main` is shared by the whole team and several other commits have landed after `a1b2c3d`. How do I undo `a1b2c3d` safely?",
+      "files": [],
+      "assertions": [
+        {"id": "git-revert-not-reset", "text": "The response recommends `git revert a1b2c3d` rather than `git reset --hard`", "type": "behavior"},
+        {"id": "no-force-push", "text": "The response does NOT recommend force-pushing or rewriting history on the shared `main` branch", "type": "behavior"},
+        {"id": "reproduce-first", "text": "The response instructs me to reproduce or confirm the breakage before reverting", "type": "quality"},
+        {"id": "verify-after-revert", "text": "The response instructs me to verify that the revert actually fixes the issue", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "revert-merge-commit-safely",
+      "prompt": "Merge commit `m4n5o6p` merged branch `feature/auth-v2` into `main`. After the merge, the login flow broke for users with uppercase emails. We need to undo the merge safely on `main` while keeping `feature/auth-v2` alive so the team can fix it there. What is the exact command and process?",
+        "files": [],
+        "assertions": [
+          {"id": "merge-revert-m1", "text": "The response uses `git revert -m 1 m4n5o6p` to revert the merge commit", "type": "behavior"},
+          {"id": "preserve-feature-branch", "text": "The response preserves the `feature/auth-v2` branch and does not delete or rewrite it", "type": "quality"},
+          {"id": "no-reset-hard", "text": "The response does not use `git reset --hard` on `main`", "type": "behavior"},
+          {"id": "no-force-push", "text": "The response does not force-push to the shared `main` branch", "type": "behavior"},
+          {"id": "verify-revert", "text": "The response includes verifying that login works after the revert", "type": "quality"}
+        ]
+    }
+  ]
+}

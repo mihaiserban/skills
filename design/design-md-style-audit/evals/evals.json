@@ -1,0 +1,33 @@
+{
+  "skill_name": "design-md-style-audit",
+  "evals": [
+    {
+      "id": 1,
+      "name": "audit-ui-against-vercel-source",
+      "prompt": "I built a startup landing page using the Vercel DESIGN.md as my source style. Here's the code. Audit it against the source — tell me what drifted and what to fix.\n\n```tsx\n// LandingPage.tsx\nexport default function LandingPage() {\n  return (\n    <div className=\"min-h-screen bg-white text-gray-900 font-serif\">\n      <header className=\"text-center py-20 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl m-4\">\n        <h1 className=\"text-5xl font-bold mb-4\">Build Faster With NeonEdge</h1>\n        <p className=\"text-xl mb-8\">The serverless database for modern teams.</p>\n        <button className=\"bg-yellow-400 text-black px-8 py-3 rounded-full text-lg shadow-lg hover:shadow-2xl transition-all duration-500\">Start Free</button>\n      </header>\n      <section className=\"grid grid-cols-3 gap-4 p-12\">\n        <div className=\"p-6 border border-gray-200 rounded-lg\">Feature 1</div>\n        <div className=\"p-6 border border-gray-200 rounded-lg\">Feature 2</div>\n        <div className=\"p-6 border border-gray-200 rounded-lg\">Feature 3</div>\n      </section>\n    </div>\n  );\n}\n```\n\nThe Vercel DESIGN.md is at /home/mihai/code/skills/design-md-catalog/vercel/DESIGN.md",
+      "files": [],
+      "assertions": [
+        {"id": "produces-findings-list", "text": "Output includes a findings list with priority labels (P1, P2, or P3)", "type": "format"},
+        {"id": "each-finding-has-fix", "text": "Each finding includes a specific fix instruction, not just a description of the problem", "type": "format"},
+        {"id": "detects-font-mismatch", "text": "Flags the serif font as inconsistent with Vercel's sans-serif typography DNA", "type": "quality"},
+        {"id": "detects-accent-only", "text": "Flags that the style is accent-only — the gradient hero is surface decoration without typography, spacing, or component geometry translation", "type": "quality"},
+        {"id": "includes-fit-assessment", "text": "Includes a Style Fit section with Fit level (strong/mixed/weak) and most important missing move", "type": "format"},
+        {"id": "names-source-path", "text": "States the selected source slug or DESIGN.md file path", "type": "format"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "audit-dashboard-token-drift",
+      "prompt": "Audit this dashboard against the Linear DESIGN.md source. I suspect the design tokens have drifted across components.\n\n```tsx\n// Dashboard.tsx\nexport default function Dashboard() {\n  return (\n    <div className=\"flex h-screen bg-[#1a1a2e]\">\n      <aside className=\"w-64 bg-[#16213e] p-6\">\n        <nav className=\"space-y-2\">\n          <a className=\"block px-4 py-2 rounded-md text-sm text-gray-400 hover:bg-[#0f3460]\">Projects</a>\n          <a className=\"block px-4 py-3 rounded-lg text-sm text-gray-300 hover:bg-[#0f3460]\">Issues</a>\n          <a className=\"block px-4 py-2 rounded-md text-sm text-gray-400 hover:bg-[#0f3460]\">Settings</a>\n        </nav>\n      </aside>\n      <main className=\"flex-1 p-8 bg-[#1a1a2e]\">\n        <table className=\"w-full\">\n          <thead>\n            <tr className=\"border-b border-gray-800\">\n              <th className=\"text-left py-3 px-2 text-xs text-gray-500\">Title</th>\n              <th className=\"text-left py-3 px-2 text-xs text-gray-500\">Status</th>\n              <th className=\"text-left py-3 px-2 text-xs text-gray-500\">Assignee</th>\n              <th className=\"text-left py-3 px-2 text-xs text-gray-500\">Priority</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr className=\"border-b border-gray-800\">\n              <td className=\"py-3 px-2 text-sm\">Fix login redirect</td>\n              <td className=\"py-3 px-2\"><span className=\"px-2 py-1 text-xs rounded-full bg-blue-500/20 text-blue-400\">In Progress</span></td>\n              <td className=\"py-3 px-2 text-sm text-gray-400\">Alice</td>\n              <td className=\"py-3 px-2\"><span className=\"px-2 py-1 text-xs rounded-full bg-red-500/20 text-red-400\">High</span></td>\n            </tr>\n          </tbody>\n        </table>\n      </main>\n    </div>\n  );\n}\n```\n\nThe Linear DESIGN.md is at /home/mihai/code/skills/design-md-catalog/linear/DESIGN.md",
+      "files": [],
+      "assertions": [
+        {"id": "produces-findings-list", "text": "Output includes a findings list with priority labels (P1, P2, or P3)", "type": "format"},
+        {"id": "detects-token-drift", "text": "Flags inconsistent padding (py-2 vs py-3) and border-radius (rounded-md vs rounded-lg) across sidebar items as token dilution", "type": "quality"},
+        {"id": "detects-inconsistent-colors", "text": "Flags that hardcoded hex colors (bg-[#1a1a2e], bg-[#16213e]) should use design tokens instead of ad-hoc values", "type": "quality"},
+        {"id": "scores-all-dimensions", "text": "Audit addresses source DNA, consistency, and execution discipline dimensions", "type": "format"},
+        {"id": "includes-fit-assessment", "text": "Includes a Style Fit section with Fit level and most important missing move", "type": "format"},
+        {"id": "preflight-stated", "text": "States preflight result as pass/partial/fail", "type": "format"}
+      ]
+    }
+  ]
+}

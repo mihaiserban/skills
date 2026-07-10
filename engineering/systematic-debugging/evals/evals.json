@@ -1,0 +1,81 @@
+{
+  "skill_name": "systematic-debugging",
+  "evals": [
+    {
+      "id": 1,
+      "name": "typeerror-null-quantity-in-worker",
+      "prompt": "Our worker logs show this crash:\n\n```\nTraceback (most recent call last):\n  File \"/app/workers/order_worker.py\", line 142, in process_batch\n    total += line.quantity * line.price\nTypeError: unsupported operand type(s) for *: 'NoneType' and 'decimal.Decimal'\n```\n\nThe input is a batch of order lines from a CSV upload. It started failing yesterday for files that previously worked. Can you fix it?",
+      "files": [],
+      "assertions": [
+        {
+          "id": "reads-whole-error",
+          "text": "Quotes the exact failing line `line.quantity * line.price` from the traceback and acknowledges the full error message before proposing any change.",
+          "type": "pattern"
+        },
+        {
+          "id": "reproduces-first",
+          "text": "Produces a minimal reproduction (e.g., a CSV row with a blank or missing `quantity`) and states that the bug cannot be verified without reproducing it.",
+          "type": "behavior"
+        },
+        {
+          "id": "named-hypothesis",
+          "text": "States a named hypothesis before editing code, e.g., `quantity is None because the CSV parser now converts empty strings to null instead of 0`.",
+          "type": "quality"
+        },
+        {
+          "id": "one-change-at-a-time",
+          "text": "Plans to change one thing at a time (parser/validation, not multiple unrelated tweaks) and re-run the repro after each change.",
+          "type": "behavior"
+        },
+        {
+          "id": "root-cause-not-symptom",
+          "text": "Proposes fixing the root cause (e.g., ensuring the parser/validation produces a numeric quantity) rather than only adding a defensive null check that hides the bad data.",
+          "type": "quality"
+        },
+        {
+          "id": "test-proves-fix",
+          "text": "Includes a specific test that proves the fix, such as a unit test exercising a CSV upload with an empty quantity.",
+          "type": "behavior"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "flaky-webhook-502",
+      "prompt": "The test `test_invoice_webhook_delivery` is flaky on CI. When it fails, the output is:\n\n```\nAssertionError: expected 200, got 502\nFile \"/app/tests/test_webhooks.py\", line 88, in test_invoice_webhook_delivery\n    assert response.status_code == 200\n```\n\nIt fails about 30% of runs, always with a 502. I can't reproduce it locally. How should we debug this?",
+      "files": [],
+      "assertions": [
+        {
+          "id": "reads-trace",
+          "text": "Acknowledges the stack trace points to line 88 (`assert response.status_code == 200`) and that `502 Bad Gateway` indicates an upstream/gateway issue, not the assertion itself.",
+          "type": "pattern"
+        },
+        {
+          "id": "reproduce-first",
+          "text": "Explains that without reproduction you cannot verify a fix, and proposes the smallest reproducible step (e.g., run the test in the CI container with retries and capture upstream service logs).",
+          "type": "behavior"
+        },
+        {
+          "id": "named-hypothesis-flaky",
+          "text": "Forms a named hypothesis, e.g., `the invoice service intermittently times out because the webhook is sent before the invoice row is committed`.",
+          "type": "quality"
+        },
+        {
+          "id": "one-variable-at-a-time",
+          "text": "Outlines changing one variable at a time (e.g., add retry, add delay, check commit ordering) and observing results rather than applying multiple changes at once.",
+          "type": "behavior"
+        },
+        {
+          "id": "stop-condition",
+          "text": "If three hypotheses fail, commits to stopping and reporting what was tried, what was observed, and what is suspected.",
+          "type": "quality"
+        },
+        {
+          "id": "no-untested-workaround",
+          "text": "Rejects a workaround that hides the 502 (e.g., swallowing the status code) without understanding the root cause.",
+          "type": "quality"
+        }
+      ]
+    }
+  ]
+}

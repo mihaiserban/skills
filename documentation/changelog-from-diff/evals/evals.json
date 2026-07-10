@@ -1,0 +1,31 @@
+{
+  "skill_name": "changelog-from-diff",
+  "evals": [
+    {
+      "id": 1,
+      "name": "release-changelog-with-breaking-change",
+      "prompt": "I'm cutting release `v2.4.0`. The merged PRs since `v2.3.0` are:\n- PR #342: refactor: extract validation helpers in `src/validators.js` (no public API change).\n- PR #345: feat: add a dark mode toggle in the settings page.\n- PR #348: fix: login failing when an email address contains uppercase characters.\n- PR #350: breaking: rename `getUser()` to `findUser()` in the public SDK.\n- PR #352: chore: update the eslint config.\n\nWrite the markdown changelog entry I can paste into `CHANGELOG.md`.",
+      "files": [],
+      "assertions": [
+        {"id": "grouped-headings", "text": "The changelog groups items under Added, Changed, Fixed (and optionally Removed/Security), skipping empty/irrelevant groups", "type": "format"},
+        {"id": "breaking-change-loud", "text": "The breaking change (`getUser` -> `findUser`) is called out loudly with a migration step", "type": "quality"},
+        {"id": "user-facing-language", "text": "The fixed entry describes the user-visible problem ('login failing for emails with uppercase characters'), not an internal implementation detail", "type": "quality"},
+        {"id": "omit-internal", "text": "Internal refactors and chores (eslint config, validation helper extraction) are omitted", "type": "quality"},
+        {"id": "no-fluff", "text": "Contains no marketing fluff like 'revolutionary' or 'enhanced experience'", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "security-hotfix-changelog",
+      "prompt": "We are preparing a hotfix release. The merged PRs are:\n- PR #401: security: patch a lodash dependency vulnerability flagged by Dependabot.\n- PR #402: fix: close a SQL injection vector in the `/search` endpoint when user input is not sanitized.\n- PR #403: refactor: rename internal module `utils/helpers.ts` to `utils/internal.ts` (no public impact).\n\nWrite the changelog entry for the hotfix.",
+      "files": [],
+      "assertions": [
+        {"id": "security-section", "text": "The changelog includes a Security section", "type": "format"},
+        {"id": "dependency-patch-mentioned", "text": "The lodash dependency vulnerability patch is listed in the Security section", "type": "quality"},
+        {"id": "sql-injection-user-facing", "text": "The SQL injection fix is described in user-facing terms (e.g. search endpoint safety), not only internal implementation", "type": "quality"},
+        {"id": "omit-internal-rename", "text": "The internal module rename with no public impact is omitted", "type": "quality"},
+        {"id": "no-empty-sections", "text": "Empty or irrelevant sections are not padded with internal details", "type": "quality"}
+      ]
+    }
+  ]
+}

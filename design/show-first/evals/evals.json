@@ -1,0 +1,34 @@
+{
+  "skill_name": "show-first",
+  "evals": [
+    {
+      "id": 1,
+      "name": "feature-plan-with-wireframe",
+      "prompt": "Plan this feature before building it. We need a task inbox dashboard for a project management tool. Users should see a list of tasks grouped by project, be able to filter by status (todo/in progress/done), quick-create a task, and see a summary bar at the top showing counts. It should handle loading, empty, and error states. Desktop only for now. Show me the plan.",
+      "files": [],
+      "assertions": [
+        {"id": "wireframe-primary", "text": "Output includes a primary layout wireframe drawn with box-drawing characters", "type": "format"},
+        {"id": "wireframe-states", "text": "Wireframe covers at least loading, empty, and error states", "type": "format"},
+        {"id": "systems-plan-sections", "text": "Systems plan includes Components, Data Flow, API Surface, State, Edge Cases, and Dependencies subsections", "type": "format"},
+        {"id": "feature-brief", "text": "Output includes a feature brief of 3-5 sentences with success criteria", "type": "format"},
+        {"id": "ui-regions-annotated", "text": "Wireframe regions are annotated with connections to systems plan sections", "type": "format"},
+        {"id": "no-code-produced", "text": "Does not produce implementation code — stays in planning phase", "type": "behavior"},
+        {"id": "feature-plan-file", "text": "Mentions writing or updating FEATURE_PLAN.md with the plan and wireframe", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "sync-check-plan-and-wireframe",
+      "prompt": "Plan a user profile settings page before coding. Users can edit display name, email, avatar upload, notification preferences (email/push/both), and delete account. It's a single-page form with sections. Include loading when fetching current settings, a dirty/unsaved state, validation errors, a saving state, and a success confirmation. Also handle the case where the settings endpoint returns a 403. Show me the plan first.",
+      "files": [],
+      "assertions": [
+        {"id": "every-state-in-wireframe", "text": "Every state mentioned in the prompt (loading, dirty, validation error, saving, success, 403) appears in the wireframes", "type": "quality"},
+        {"id": "api-surface-mapped", "text": "Systems plan API Surface section names at least one endpoint for fetching and one for saving settings", "type": "quality"},
+        {"id": "edge-cases-403", "text": "Edge Cases section addresses the 403 permission denied case", "type": "quality"},
+        {"id": "form-sections-in-wireframe", "text": "Wireframe shows visual grouping of form sections (display name, email, avatar, notifications, danger zone)", "type": "format"},
+        {"id": "visual-language-recorded", "text": "Records a selected DESIGN.md path and its DNA dimensions under Visual Language section", "type": "format"},
+        {"id": "no-code-produced", "text": "Does not produce implementation code — stays in planning phase", "type": "behavior"}
+      ]
+    }
+  ]
+}

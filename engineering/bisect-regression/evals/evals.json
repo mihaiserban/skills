@@ -1,0 +1,30 @@
+{
+  "skill_name": "bisect-regression",
+  "evals": [
+    {
+      "id": 1,
+      "name": "api-status-regression-between-tags",
+      "prompt": "Our checkout service's `POST /payments` endpoint started returning 500s last sprint. Commit `a1b2c3d` (tag `v2.1.0`) is known-good: the same request returns `201 Created` with a payment id. Commit `9f8e7d6` (tag `v2.2.0`, current HEAD) is known-bad: the same request returns `500 Internal Server Error`. I can reproduce with `curl -X POST http://localhost:8080/payments -d '{\"amount\":100}'`. There are about 45 commits between the tags. Walk me through finding the exact commit that introduced the regression.",
+      "files": [],
+      "assertions": [
+        {"id": "uses-bisect", "text": "Uses git bisect (start, bad, good) rather than manually checking out commits one by one", "type": "behavior"},
+        {"id": "marks-good-bad", "text": "Marks the known-good commit a1b2c3d as good and the known-bad commit 9f8e7d6 as bad", "type": "behavior"},
+        {"id": "uses-curl-as-test", "text": "Uses the curl command as the reproduction test at each bisect step", "type": "behavior"},
+        {"id": "reads-diff", "text": "After bisect identifies the first bad commit, instructs reading its diff to find the bug", "type": "behavior"},
+        {"id": "resets", "text": "Includes git bisect reset at the end", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "automated-unit-test-bisect",
+      "prompt": "The unit test `test_discount_code_lowercase` fails on `main` at commit `z9y8x7w` but passes on the release branch at commit `m1n2o3p`. I have a script `./run_test.sh test_discount_code_lowercase` that exits `0` when the test passes and `1` when it fails. There are about 80 commits between the two. I don't want to manually check each one. How do I automate the bisect and what do I do once git names the bad commit?",
+      "files": [],
+      "assertions": [
+        {"id": "uses-bisect-run", "text": "Uses git bisect run with the test script to automate the bisect", "type": "behavior"},
+        {"id": "marks-good-bad", "text": "Marks z9y8x7w as bad and m1n2o3p as good", "type": "behavior"},
+        {"id": "reads-diff-after", "text": "After bisect names the bad commit, instructs reading the diff to find the offending line", "type": "behavior"},
+        {"id": "resets", "text": "Includes git bisect reset after the automated bisect completes", "type": "behavior"}
+      ]
+    }
+  ]
+}

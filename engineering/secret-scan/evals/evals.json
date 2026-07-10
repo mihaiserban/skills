@@ -1,0 +1,32 @@
+{
+  "skill_name": "secret-scan",
+  "evals": [
+    {
+      "id": 1,
+      "name": "catch-hardcoded-keys",
+      "prompt": "Review this config file before I commit it. Are there any problems?\n\n```ini\n# .env.local\nDATABASE_URL=postgresql://user:my_secret_password@localhost:5432/mydb\nAWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE\nAWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\nOPENAI_API_KEY=sk-proj-abc123def456\nSTRIPE_KEY=pk_live_abc123\nAPP_PORT=3000\nDEBUG=true\n```\n\nTell me exactly what's wrong and what to do.",
+      "files": [],
+      "assertions": [
+        {"id": "flags-db-password", "text": "Flags the database connection string with embedded password", "type": "quality"},
+        {"id": "flags-aws-key", "text": "Flags the AWS access key", "type": "quality"},
+        {"id": "flags-openai-key", "text": "Flags the OpenAI API key", "type": "quality"},
+        {"id": "flags-stripe-key", "text": "Flags the Stripe live key", "type": "quality"},
+        {"id": "flags-aws-secret", "text": "Flags the AWS secret access key", "type": "quality"},
+        {"id": "rotation-instruction", "text": "Recommends rotating secrets that appear in the file", "type": "behavior"},
+        {"id": "env-instruction", "text": "Recommends moving secrets to environment variables or a secrets manager", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "detect-token-in-code",
+      "prompt": "Look at this code snip before I push — anything dangerous?\n\n```typescript\nimport axios from 'axios';\n\nconst API_KEY = 'sk-ant-api03-abc123def456';\nconst GH_TOKEN = 'ghp_1a2b3c4d5e6f7g8h9i0j';\n\nasync function callAPI(endpoint: string) {\n  const response = await axios.get(`https://api.example.com/${endpoint}`, {\n    headers: {\n      'Authorization': `Bearer ${API_KEY}`,\n      'X-GitHub-Token': GH_TOKEN\n    }\n  });\n  return response.data;\n}\n```",
+      "files": [],
+      "assertions": [
+        {"id": "flags-anthropic-key", "text": "Flags the Anthropic API key", "type": "quality"},
+        {"id": "flags-github-token", "text": "Flags the GitHub personal access token", "type": "quality"},
+        {"id": "compromised-warning", "text": "Warns that committed secrets are compromised and must be rotated", "type": "behavior"},
+        {"id": "env-move", "text": "Recommends moving keys to environment variables", "type": "behavior"}
+      ]
+    }
+  ]
+}

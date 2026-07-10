@@ -1,0 +1,31 @@
+{
+  "skill_name": "design-md-style-picker",
+  "evals": [
+    {
+      "id": 1,
+      "name": "pick-style-for-dev-tool",
+      "prompt": "I'm building a CLI terminal emulator web app — it's a keyboard-first developer tool with a command palette, split panes, and terminal output panels. Dark theme, high information density, precise typography. What DESIGN.md source aesthetic should I use? Pick one and explain why.",
+      "files": [],
+      "assertions": [
+        {"id": "selects-one-primary", "text": "Selects exactly one primary source style with a slug and DESIGN.md path", "type": "format"},
+        {"id": "dna-dimensions-filled", "text": "Recommendation includes Color, Typography, Layout, Components, and Signature gesture DNA dimensions", "type": "format"},
+        {"id": "rationale-tied-to-brief", "text": "Why it fits section gives 1-3 concrete reasons tied to the keyboard-first, high-density tool workflow", "type": "quality"},
+        {"id": "avoid-section", "text": "Includes an Avoid section that warns about brand copying or style mismatch risks", "type": "format"},
+        {"id": "product-fit-over-surface", "text": "Selection rationale prioritizes product workflow fit over surface visual similarity", "type": "quality"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "pick-style-for-fintech-dashboard",
+      "prompt": "I'm designing a personal finance dashboard. Users connect bank accounts, see spending categorized into charts, set budgets, and get alerts. Audience is regular consumers, not traders. It should feel trustworthy, clear, and friendly — not cold or intimidating. The brief says 'friendly clarity, not Wall Street density.' What DESIGN.md style fits?",
+      "files": [],
+      "assertions": [
+        {"id": "selects-one-primary", "text": "Selects exactly one primary source style with a slug and DESIGN.md path", "type": "format"},
+        {"id": "dna-dimensions-filled", "text": "Recommendation includes Color, Typography, Layout, Components, and Signature gesture DNA dimensions", "type": "format"},
+        {"id": "friendly-not-trading", "text": "Does not pick a trading-density or high-frequency data source — respects the 'friendly clarity' brief", "type": "quality"},
+        {"id": "avoid-section", "text": "Includes an Avoid section that warns about brand copying or style mismatch risks", "type": "format"},
+        {"id": "secondary-source-discipline", "text": "If a secondary source is mentioned, it is explicitly labeled as secondary with a reason", "type": "format"}
+      ]
+    }
+  ]
+}
