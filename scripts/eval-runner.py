@@ -2,25 +2,32 @@
 """Run skill evals in parallel: with-skill vs without-skill.
 
 Usage:
-    eval-runner.py <skill-path>... [--iterations N] [--timeout SECS] [--parallel P]
-    eval-runner.py --all [--iterations N] [--timeout SECS] [--parallel P]
+    eval-runner.py <skill-path>... [--iterations N] [--timeout SECS] [--parallel P] [--trials N] [--provider docker|local]
+    eval-runner.py --all [--iterations N] [--timeout SECS] [--parallel P] [--trials N] [--provider docker|local]
 
-    --all          Discover and run all skills under engineering/, general/,
-                   design/, etc. that have evals/evals.json.
-    --parallel P   Max concurrent pi processes (default: 4).
-    --timeout SECS Per-process timeout (default: 600).
+    --all           Discover and run all skills under engineering/, general/,
+                    design/, etc. that have evals/evals.json.
+    --parallel P    Max concurrent pi processes (default: 4).
+    --timeout SECS  Per-process timeout (default: 600).
+    --trials N      Run each eval N times for variance estimation.
+    --smoke         5 trials (quick capability check).
+    --reliable      15 trials (reliable pass rate estimate).
+    --regression    30 trials (high-confidence regression detection).
+    --provider      Execution provider: local (default) or docker.
+                    docker: each eval runs in a fresh container with pi
+                    installed, no host filesystem access, no global skills.
+                    local: runs pi on the host with global skill dir isolation.
 
 Uses pi as the eval harness with full skill isolation:
-    - Global skill dirs moved during eval runs (prevents contamination)
-    - --no-skills --no-extensions disables all discovery
+    - Docker: fresh container per run, no global skills, no host FS access
+    - Local: --no-skills + global dir moving + --skill <path> for isolation
     - --skill <path> loads ONLY the tested skill for with_skill variant
     - --no-context-files --no-session prevents context/session contamination
-    - Sandbox workdir with git init prevents real repo state reading
-    - Only the gateway extension is loaded (for model access)
 """
 import atexit
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -40,6 +47,8 @@ GLOBAL_SKILL_DIRS = [
 ]
 
 GATEWAY_EXTENSION = str(Path.home() / ".pi" / "agent" / "extensions" / "gateway")
+PI_AUTH_FILE = str(Path.home() / ".pi" / "agent" / "auth.json")
+DOCKER_IMAGE_TAG = "eval-pi-runner"
 
 _moved_dirs: list[tuple[Path, Path]] = []
 
@@ -157,6 +166,121 @@ def make_sandbox(skill_dir: Path, iter_label: str) -> Path:
     return d
 
 
+def build_docker_image() -> bool:
+    """Build the eval Docker image with pi + gateway extension. Returns True on success."""
+    import tempfile
+    import textwrap
+
+    gateway_dir = Path(GATEWAY_EXTENSION)
+    auth_file = Path(PI_AUTH_FILE)
+    if not gateway_dir.exists():
+        sys.stderr.write(f"error: gateway extension not found at {gateway_dir}\n")
+        return False
+    if not auth_file.exists():
+        sys.stderr.write(f"error: pi auth.json not found at {auth_file}\n")
+        return False
+
+    build_ctx = Path(tempfile.mkdtemp(prefix="eval-docker-"))
+    try:
+        # Copy gateway extension and auth into build context
+        shutil.copytree(gateway_dir, build_ctx / "gateway")
+        shutil.copy2(auth_file, build_ctx / "auth.json")
+
+        dockerfile = textwrap.dedent("""\
+            FROM node:20-slim
+            RUN apt-get update -qq && apt-get install -y -qq git python3 > /dev/null 2>&1 && rm -rf /var/lib/apt/lists/*
+            RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+            RUN mkdir -p /root/.pi/agent/extensions /root/.pi/agent/skills
+            COPY gateway /root/.pi/agent/extensions/gateway
+            COPY auth.json /root/.pi/agent/auth.json
+            ENV PI_OFFLINE=1
+            ENV PI_SKIP_VERSION_CHECK=1
+            WORKDIR /workspace
+            ENTRYPOINT ["pi"]
+        """)
+        (build_ctx / "Dockerfile").write_text(dockerfile, encoding="utf-8")
+
+        print("  Building Docker image (this happens once)...")
+        proc = subprocess.run(
+            ["docker", "build", "-t", DOCKER_IMAGE_TAG, str(build_ctx)],
+            capture_output=True, text=True, timeout=300,
+        )
+        if proc.returncode != 0:
+            sys.stderr.write(f"docker build failed: {proc.stderr[:500]}\n")
+            return False
+        print(f"  Image built: {DOCKER_IMAGE_TAG}")
+        return True
+    finally:
+        shutil.rmtree(build_ctx, ignore_errors=True)
+
+
+def run_pi_docker(
+    prompt: str,
+    model: str,
+    output_dir: Path,
+    skill_paths: list[Path] | None,
+    eval_files: list[Path],
+    timeout: int = 600,
+) -> dict[str, Any]:
+    """Run pi inside a Docker container with full isolation."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    prompt_file = output_dir / "prompt.txt"
+    prompt_file.write_text(prompt, encoding="utf-8")
+
+    cmd = [
+        "docker", "run", "--rm",
+        "-v", f"{output_dir.resolve()}:/output",
+    ]
+
+    # Mount skill files read-only
+    if skill_paths:
+        for i, sp in enumerate(skill_paths):
+            mount = f"{sp.resolve()}:/skills/skill-{i}/SKILL.md:ro"
+            cmd.extend(["-v", mount])
+
+    # Mount eval fixture files read-only
+    for i, ef in enumerate(eval_files):
+        mount = f"{ef.resolve()}:/fixtures/file-{i}/{ef.name}:ro"
+        cmd.extend(["-v", mount])
+
+    # Build the pi command that runs inside the container
+    pi_cmd = [
+        "--no-skills", "--no-extensions",
+        "-e", "/root/.pi/agent/extensions/gateway",
+        "--no-context-files", "--no-session",
+        "--model", model,
+        "-p", prompt,
+    ]
+    if skill_paths:
+        for i in range(len(skill_paths)):
+            pi_cmd.extend(["--skill", f"/skills/skill-{i}/SKILL.md"])
+
+    cmd.append(DOCKER_IMAGE_TAG)
+    cmd.extend(pi_cmd)
+
+    start = time.monotonic()
+    try:
+        proc = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=timeout,
+        )
+        elapsed_ms = int((time.monotonic() - start) * 1000)
+        result: dict[str, Any] = {"exit_code": proc.returncode, "duration_ms": elapsed_ms}
+        if proc.stdout.strip():
+            result["output"] = proc.stdout.strip()
+        if proc.stderr.strip():
+            result["stderr"] = proc.stderr.strip()[:3000]
+    except subprocess.TimeoutExpired:
+        elapsed_ms = int((time.monotonic() - start) * 1000)
+        result = {"exit_code": -1, "duration_ms": elapsed_ms, "output": "", "stderr": "TIMEOUT"}
+    except Exception as e:
+        elapsed_ms = int((time.monotonic() - start) * 1000)
+        result = {"exit_code": -2, "duration_ms": elapsed_ms, "output": "", "stderr": str(e)[:2000]}
+
+    result_file = output_dir / "raw_result.json"
+    save_json(result_file, result)
+    return result
+
+
 def run_pi(
     prompt: str,
     model: str,
@@ -215,6 +339,7 @@ def build_run_specs(
     model: str,
     iter_label: str,
     timeout: int,
+    trials: int = 1,
 ) -> list[dict]:
     evals_data = load_json(skill_dir / "evals" / "evals.json")
     skill_md_path = skill_dir / "SKILL.md"
@@ -233,51 +358,66 @@ def build_run_specs(
     specs = []
     for case in evals_data["evals"]:
         evalfiles = resolve_eval_files(skill_dir, case)
-        workdir = skill_dir / "eval-results" / iter_label / case["name"]
+        for trial in range(1, trials + 1):
+            trial_prefix = f"trial-{trial}/" if trials > 1 else ""
+            workdir = skill_dir / "eval-results" / iter_label / f"{trial_prefix}{case['name']}"
 
-        specs.append({
-            "label": f"{skill_dir.name}/{case['name']}/with_skill",
-            "prompt": build_prompt(case, read_skill_md(skill_dir)),
-            "model": model,
-            "output_dir": workdir / "with_skill" / "outputs",
-            "skill_paths": with_skill_paths,
-            "timeout": timeout,
-            "skill_dir": skill_dir,
-            "iter_label": iter_label,
-        })
-        specs.append({
-            "label": f"{skill_dir.name}/{case['name']}/without_skill",
-            "prompt": build_prompt(case, None),
-            "model": model,
-            "output_dir": workdir / "without_skill" / "outputs",
-            "skill_paths": None,
-            "timeout": timeout,
-            "skill_dir": skill_dir,
-            "iter_label": iter_label,
-        })
+            specs.append({
+                "label": f"{skill_dir.name}/{case['name']}/with_skill{f'/trial-{trial}' if trials > 1 else ''}",
+                "prompt": build_prompt(case, read_skill_md(skill_dir)),
+                "model": model,
+                "output_dir": workdir / "with_skill" / "outputs",
+                "skill_paths": with_skill_paths,
+                "eval_files": evalfiles,
+                "timeout": timeout,
+                "skill_dir": skill_dir,
+                "iter_label": iter_label,
+            })
+            specs.append({
+                "label": f"{skill_dir.name}/{case['name']}/without_skill{f'/trial-{trial}' if trials > 1 else ''}",
+                "prompt": build_prompt(case, None),
+                "model": model,
+                "output_dir": workdir / "without_skill" / "outputs",
+                "skill_paths": None,
+                "eval_files": evalfiles,
+                "timeout": timeout,
+                "skill_dir": skill_dir,
+                "iter_label": iter_label,
+            })
     return specs
 
 
-def run_all(all_specs: list[dict], max_workers: int) -> list[dict]:
+def run_all(all_specs: list[dict], max_workers: int, provider: str = "local") -> list[dict]:
     total = len(all_specs)
     completed = 0
     results = []
 
-    print(f"\n=== Running {total} eval cases across {max_workers} workers ===\n")
+    print(f"\n=== Running {total} eval cases across {max_workers} workers ({provider}) ===\n")
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {}
         for spec in all_specs:
-            sandbox = make_sandbox(spec["skill_dir"], spec["iter_label"])
-            future = executor.submit(
-                run_pi,
-                spec["prompt"],
-                spec["model"],
-                sandbox,
-                spec["output_dir"],
-                spec["skill_paths"],
-                spec["timeout"],
-            )
+            if provider == "docker":
+                future = executor.submit(
+                    run_pi_docker,
+                    spec["prompt"],
+                    spec["model"],
+                    spec["output_dir"],
+                    spec["skill_paths"],
+                    spec.get("eval_files", []),
+                    spec["timeout"],
+                )
+            else:
+                sandbox = make_sandbox(spec["skill_dir"], spec["iter_label"])
+                future = executor.submit(
+                    run_pi,
+                    spec["prompt"],
+                    spec["model"],
+                    sandbox,
+                    spec["output_dir"],
+                    spec["skill_paths"],
+                    spec["timeout"],
+                )
             futures[future] = spec
 
         for future in as_completed(futures):
@@ -307,9 +447,22 @@ def main() -> None:
     all_mode = "--all" in args
     args = [a for a in args if a != "--all"]
 
+    # Trial presets
+    trials = 1
+    if "--smoke" in args:
+        trials = 5
+        args = [a for a in args if a != "--smoke"]
+    elif "--reliable" in args:
+        trials = 15
+        args = [a for a in args if a != "--reliable"]
+    elif "--regression" in args:
+        trials = 30
+        args = [a for a in args if a != "--regression"]
+
     iterations = 1
     timeout = DEFAULT_TIMEOUT
     max_workers = DEFAULT_PARALLEL
+    provider = "local"
 
     positional = []
     i = 0
@@ -323,6 +476,12 @@ def main() -> None:
             i += 2
         elif a == "--parallel" and i + 1 < len(args):
             max_workers = int(args[i + 1])
+            i += 2
+        elif a == "--trials" and i + 1 < len(args):
+            trials = int(args[i + 1])
+            i += 2
+        elif a == "--provider" and i + 1 < len(args):
+            provider = args[i + 1]
             i += 2
         elif not a.startswith("-"):
             positional.append(a)
@@ -354,7 +513,7 @@ def main() -> None:
             continue
         iteration = next_iteration(skill_dir)
         iter_label = f"iteration-{iteration}"
-        all_specs.extend(build_run_specs(skill_dir, model, iter_label, timeout))
+        all_specs.extend(build_run_specs(skill_dir, model, iter_label, timeout, trials))
         n_evals = len(load_json(skill_dir / "evals" / "evals.json")["evals"])
         skill_names.append(f"{skill_dir.name} ({n_evals} evals)")
         print(f"Queued: {skill_dir.name} ({n_evals} evals) → {iter_label}")
@@ -364,16 +523,21 @@ def main() -> None:
 
     print(f"\nModel: {model}")
     print(f"Skills: {', '.join(skill_names)}")
-    print(f"Workers: {max_workers}, Timeout: {timeout}s")
+    print(f"Workers: {max_workers}, Timeout: {timeout}s, Trials: {trials}, Provider: {provider}")
 
-    print("\nIsolating global skills...")
-    isolate_global_skills()
-
-    try:
-        run_all(all_specs, max_workers)
-    finally:
-        print("\nRestoring global skills...")
-        restore_global_skills()
+    if provider == "docker":
+        if not build_docker_image():
+            sys.exit("Docker image build failed. Falling back: use --provider=local")
+        # Docker containers have no global skill dirs — no isolation needed
+        run_all(all_specs, max_workers, provider="docker")
+    else:
+        print("\nIsolating global skills...")
+        isolate_global_skills()
+        try:
+            run_all(all_specs, max_workers, provider="local")
+        finally:
+            print("\nRestoring global skills...")
+            restore_global_skills()
 
     print(f"\nDone. {len(all_specs)} runs across {len(skill_dirs)} skill(s).")
     print("Run eval-grade.py and eval-aggregate.py to complete the pipeline.")

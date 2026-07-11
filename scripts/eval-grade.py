@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""Grade eval outputs against assertions.
+"""Grade eval outputs against assertions and deterministic graders.
 
 Usage:
     eval-grade.py <skill-path> [--iteration N] [--parallel P] [--model M]
     eval-grade.py --all [--iteration N] [--parallel P] [--model M]
 
-For deterministic checks, uses pattern matching and heuristics.
-For everything else, sends all ungraded assertions for one eval variant
-through a single opencode run using a dedicated grader model.
+Supports two grader types:
+    1. assertions (LLM-graded) — existing, backward compatible
+    2. graders (deterministic + llm_rubric) — new, weighted combination
 
-Default grader model is gateway/coder:fast for speed. Use --model to override
-when assertions require heavier reasoning.
+Deterministic graders run a script in the eval's output directory.
+The script outputs JSON: {"score": 0.67, "details": "...", "checks": [...]}
+LLM rubric graders evaluate the output against qualitative criteria.
+
+When both assertions and graders are present, graders take precedence.
+Default grader model is gateway/coder. Use --model to override.
 """
 import json
 import os
@@ -47,7 +51,7 @@ def save_json(path: Path, data: Any) -> None:
 def read_text(path: Path) -> str:
     if not path.exists():
         return ""
-    return path.read_text(encoding="utf-8")
+    return path.read_text(encoding="utf-8", errors="replace")
 
 
 def discover_skills() -> list[Path]:
@@ -217,16 +221,140 @@ def batch_llm_grade(
     return results
 
 
-def grade_variant(
-    assertions: list[dict],
+def run_deterministic_grader(
+    grader_config: dict,
+    output_dir: Path,
+    output: str,
+) -> dict[str, Any]:
+    run_cmd = grader_config.get("run", "")
+    if not run_cmd:
+        return {"score": 0.0, "details": "no run command in deterministic grader", "checks": []}
+
+    grader_script = output_dir / "_grader_script.sh"
+    grader_script.write_text(run_cmd, encoding="utf-8")
+    grader_script.chmod(0o755)
+
+    try:
+        proc = subprocess.run(
+            ["bash", str(grader_script)],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=str(output_dir),
+            input=output,
+        )
+        grader_output = proc.stdout.strip()
+        result = json.loads(grader_output)
+        return {
+            "score": float(result.get("score", 0.0)),
+            "details": result.get("details", ""),
+            "checks": result.get("checks", []),
+        }
+    except subprocess.TimeoutExpired:
+        return {"score": 0.0, "details": "deterministic grader timed out (30s)", "checks": []}
+    except json.JSONDecodeError:
+        return {"score": 0.0, "details": f"grader output not valid JSON: {grader_output[:200]}", "checks": []}
+    except Exception as e:
+        return {"score": 0.0, "details": f"grader error: {str(e)[:200]}", "checks": []}
+
+
+def run_llm_rubric_grader(
+    grader_config: dict,
     output: str,
     grader_model: str,
     workdir: Path,
-) -> list[dict]:
-    if output == "OPENCODE_RUN_FAILED":
-        return [{"id": a["id"], "text": a["text"], "passed": False,
-                 "evidence": "opencode run failed"} for a in assertions]
+) -> dict[str, Any]:
+    rubric = grader_config.get("rubric", "")
 
+    rubric_file = workdir / "_rubric.txt"
+    rubric_path = Path(rubric)
+    if rubric_path.exists():
+        rubric = rubric_path.read_text(encoding="utf-8")
+
+    prompt = f"""You are grading a model's output against a rubric. Return a JSON object with "score" (0.0-1.0) and "details" (one sentence).
+
+Rubric:
+{rubric}
+
+<model_output>
+{output[:10000]}
+</model_output>
+
+Return ONLY valid JSON: {{"score": 0.0, "details": "..."}}
+"""
+
+    try:
+        import tempfile
+        grade_workdir = Path(tempfile.mkdtemp(prefix="grade-"))
+        gateway_ext = str(Path.home() / ".pi" / "agent" / "extensions" / "gateway")
+        proc = subprocess.run(
+            ["pi", "--no-skills", "--no-extensions", "-e", gateway_ext,
+             "--no-context-files", "--no-session",
+             "--model", grader_model, "-p", prompt],
+            capture_output=True,
+            text=True,
+            timeout=120,
+            cwd=str(grade_workdir),
+        )
+        response = proc.stdout.strip()
+        shutil.rmtree(grade_workdir, ignore_errors=True)
+
+        json_match = re.search(r'\{[^{}]*"score"[^{}]*\}', response, re.DOTALL)
+        if json_match:
+            result = json.loads(json_match.group())
+            return {
+                "score": float(result.get("score", 0.0)),
+                "details": result.get("details", ""),
+            }
+        return {"score": 0.0, "details": f"could not parse rubric grade from response: {response[:200]}", "checks": []}
+    except Exception as e:
+        return {"score": 0.0, "details": f"rubric grader error: {str(e)[:200]}", "checks": []}
+
+
+def grade_variant(
+    eval_case: dict,
+    output: str,
+    grader_model: str,
+    workdir: Path,
+    output_dir: Path,
+) -> dict[str, Any]:
+    if output == "OPENCODE_RUN_FAILED":
+        assertions = eval_case.get("assertions", [])
+        return {
+            "assertion_results": [{"id": a["id"], "text": a["text"], "passed": False,
+                                   "evidence": "run failed"} for a in assertions],
+            "grader_results": [],
+            "weighted_score": 0.0,
+        }
+
+    graders = eval_case.get("graders", [])
+    assertions = eval_case.get("assertions", [])
+
+    if graders:
+        grader_results = []
+        for g in graders:
+            gtype = g.get("type", "deterministic")
+            weight = g.get("weight", 1.0)
+            if gtype == "deterministic":
+                result = run_deterministic_grader(g, output_dir, output)
+            elif gtype == "llm_rubric":
+                result = run_llm_rubric_grader(g, output, grader_model, workdir)
+            else:
+                result = {"score": 0.0, "details": f"unknown grader type: {gtype}", "checks": []}
+            result["type"] = gtype
+            result["weight"] = weight
+            grader_results.append(result)
+
+        total_weight = sum(g["weight"] for g in graders)
+        weighted_score = sum(r["score"] * r["weight"] for r in grader_results) / total_weight if total_weight else 0.0
+
+        return {
+            "grader_results": grader_results,
+            "weighted_score": round(weighted_score, 3),
+            "assertion_results": [],
+        }
+
+    # Fall back to assertion-based grading (backward compatible)
     results = []
     llm_assertions = []
     for assertion in assertions:
@@ -252,7 +380,16 @@ def grade_variant(
                 "evidence": evidence,
             })
 
-    return sorted(results, key=lambda r: r["id"])
+    results = sorted(results, key=lambda r: r["id"])
+    passed_count = sum(1 for r in results if r["passed"])
+    total_count = len(results)
+    weighted_score = passed_count / total_count if total_count else 0.0
+
+    return {
+        "assertion_results": results,
+        "grader_results": [],
+        "weighted_score": round(weighted_score, 3),
+    }
 
 
 def grade_skill(
@@ -274,46 +411,75 @@ def grade_skill(
     tasks = []
     for case in eval_cases:
         eval_name = case["name"]
-        workdir = it_dir / eval_name
-        assertions = case["assertions"]
-        for variant in ("with_skill", "without_skill"):
-            output_dir = workdir / variant / "outputs"
-            output = find_outputs(output_dir)
-            tasks.append({
-                "skill": skill_path.name,
-                "eval": eval_name,
-                "variant": variant,
-                "workdir": workdir / variant,
-                "assertions": assertions,
-                "output": output,
-            })
 
-    total_passed = 0
-    total_assertions = 0
+        # Check for trial directories
+        trial_dirs = []
+        for item in sorted(it_dir.iterdir()):
+            if item.is_dir() and item.name.startswith("trial-"):
+                trial_dirs.append(item)
+
+        if trial_dirs:
+            for trial_dir in trial_dirs:
+                eval_dir = trial_dir / eval_name
+                if not eval_dir.exists():
+                    continue
+                for variant in ("with_skill", "without_skill"):
+                    output_dir = eval_dir / variant / "outputs"
+                    output = find_outputs(output_dir)
+                    tasks.append({
+                        "skill": skill_path.name,
+                        "eval": eval_name,
+                        "variant": variant,
+                        "trial": trial_dir.name,
+                        "workdir": eval_dir / variant,
+                        "output_dir": output_dir,
+                        "eval_case": case,
+                        "output": output,
+                    })
+        else:
+            eval_dir = it_dir / eval_name
+            for variant in ("with_skill", "without_skill"):
+                output_dir = eval_dir / variant / "outputs"
+                output = find_outputs(output_dir)
+                tasks.append({
+                    "skill": skill_path.name,
+                    "eval": eval_name,
+                    "variant": variant,
+                    "trial": None,
+                    "workdir": eval_dir / variant,
+                    "output_dir": output_dir,
+                    "eval_case": case,
+                    "output": output,
+                })
+
+    total_score = 0.0
+    total_count = 0
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(
                 grade_variant,
-                t["assertions"],
+                t["eval_case"],
                 t["output"],
                 grader_model,
                 t["workdir"],
+                t["output_dir"],
             ): t for t in tasks
         }
 
         for future in as_completed(futures):
             t = futures[future]
             try:
-                results = future.result()
-                save_json(t["workdir"] / "grading.json", results)
-                passed = sum(1 for r in results if r["passed"])
-                total_passed += passed
-                total_assertions += len(results)
+                result = future.result()
+                save_json(t["workdir"] / "grading.json", result)
+                score = result["weighted_score"]
+                total_score += score
+                total_count += 1
             except Exception as e:
                 sys.stderr.write(f"grading failed for {t['skill']}/{t['eval']}/{t['variant']}: {e}\n")
 
-    print(f"  {skill_path.name}: {total_passed}/{total_assertions} passed")
+    avg_score = total_score / total_count if total_count else 0.0
+    print(f"  {skill_path.name}: avg score {avg_score:.1%} ({total_count} variants)")
 
 
 def main() -> None:
@@ -357,9 +523,10 @@ def main() -> None:
         for sd in skill_dirs:
             grade_skill(sd, grader_model, max_workers, iteration)
     elif positional:
-        skill_path = Path(positional[0]).resolve()
-        print(f"Grading {skill_path.name} with {grader_model} ({max_workers} workers)")
-        grade_skill(skill_path, grader_model, max_workers, iteration)
+        for p in positional:
+            skill_path = Path(p).resolve()
+            print(f"Grading {skill_path.name} with {grader_model} ({max_workers} workers)")
+            grade_skill(skill_path, grader_model, max_workers, iteration)
     else:
         print(__doc__)
         return

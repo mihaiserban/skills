@@ -3,8 +3,8 @@ set -euo pipefail
 # Start the full eval pipeline.
 #
 # Usage:
-#   scripts/start-evals.sh <skill-path> [--parallel N] [--timeout SECS] [--model M]
-#   scripts/start-evals.sh --all [--parallel N] [--timeout SECS] [--model M]
+#   scripts/start-evals.sh <skill-path> [--parallel N] [--timeout SECS] [--model M] [--provider docker|local] [--smoke|--reliable|--regression]
+#   scripts/start-evals.sh --all [--parallel N] [--timeout SECS] [--model M] [--provider docker|local] [--smoke|--reliable|--regression]
 #
 # Runs: eval-runner.py → eval-grade.py → eval-aggregate.py --output html
 
