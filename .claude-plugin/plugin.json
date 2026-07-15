@@ -9,6 +9,7 @@
     "./design/design-md-style-picker",
     "./design/design-taste-distiller",
     "./design/show-first",
+    "./documentation/axiomatic-rewrite",
     "./documentation/changelog-from-diff",
     "./documentation/decision-record",
     "./engineering/adversarial-verify",

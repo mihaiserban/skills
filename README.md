@@ -33,6 +33,7 @@ our skills plus included vendored skills.
 | Skill | Invocation | Type | Description |
 |---|---|---|---|
 | `/adversarial-verify` | Model | Auto-invoked | Review a diff against the goal spec assuming the code is BROKEN |
+| `/axiomatic-rewrite` | User | `disable-model-invocation` | Decompose a document into axioms, approve each, reassemble a fresh document |
 | `/bisect-regression` | Model | Auto-invoked | Binary-search git history to find the commit that introduced a bug |
 | `/blog-post` | User | `disable-model-invocation` | Distill a conversation or completed task into a mihaiserban.dev blog post |
 | `/changelog-from-diff` | Model | Auto-invoked | Turn commits or a diff into a clean user-facing changelog entry |
@@ -68,6 +69,7 @@ our skills plus included vendored skills.
 
 | Skill | When to use |
 |---|---|
+| `/axiomatic-rewrite` | Rewrite or restructure a document where every claim must be deliberate |
 | `/blog-post` | User wants to turn a conversation or task into a blog post |
 | `/research` | Research a technical or scientific topic on arXiv |
 | `/setup-skills` | Once per repo. Configures issue tracker, labels, domain layout before other skills run |
@@ -225,6 +227,7 @@ vendored submodules.
 │   ├── design-taste-distiller/
 │   └── show-first/
 ├── documentation/
+│   ├── axiomatic-rewrite/
 │   ├── changelog-from-diff/
 │   └── decision-record/
 ├── engineering/
