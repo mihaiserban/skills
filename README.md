@@ -150,8 +150,11 @@ git submodule update --remote --recursive
 
 | Vendor | Source | Skills |
 |---|---|---|
+| **cloudflare** | [cloudflare/skills](https://github.com/cloudflare/skills) | `/agents-sdk`, `/cloudflare`, `/durable-objects`, `/sandbox-next`, `/wrangler`, `/web-perf`, etc. (13 skills) |
+| **expo** | [expo/skills](https://github.com/expo/skills) | `/expo-router`, `/expo-native-ui`, `/eas-workflows`, `/eas-app-stores`, etc. (20 skills) |
 | **ponytail** | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | `/ponytail`, `/ponytail-review`, `/ponytail-audit`, `/ponytail-debt`, `/ponytail-gain`, `/ponytail-help` |
 | **awesome-design-md** | [voltagent/awesome-design-md](https://github.com/voltagent/awesome-design-md) | DESIGN.md catalog for style picker/apply/audit |
+| **agent-skills** | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | General-purpose agent skills for planning, review, debugging, etc. (21 skills) |
 
 ## Maintenance
 
@@ -165,7 +168,7 @@ After adding, deleting, moving, or renaming a skill, run:
 bash scripts/check-pack.sh
 ```
 
-Expected result today: `26 published skill(s), 32 manifest skill(s)`.
+Expected result today: `30 published skill(s), 92 manifest skill(s)`.
 
 ## Verification
 
@@ -211,8 +214,12 @@ vendored submodules.
     │   ├── eval-aggregate.py    # aggregate into benchmark.json + HTML
     │   └── start-evals.sh       # full pipeline: run → grade → aggregate
 ├── vendor/
+│   ├── cloudflare/        # git submodule, 13 skills
+│   ├── expo/              # git submodule, 20 skills
 │   ├── ponytail/
 │   │   └── skills/        # git submodule, 6 external skills
+│   ├── agent-skills/
+│   │   └── skills/        # git submodule, 21 external skills
 │   └── awesome-design-md/ # git submodule, DESIGN.md catalog
 ├── .claude-plugin/
 │   └── plugin.json

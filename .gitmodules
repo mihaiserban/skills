@@ -7,3 +7,9 @@
 [submodule "vendor/agent-skills"]
 	path = vendor/agent-skills
 	url = https://github.com/addyosmani/agent-skills
+[submodule "vendor/cloudflare"]
+	path = vendor/cloudflare
+	url = https://github.com/cloudflare/skills
+[submodule "vendor/expo"]
+	path = vendor/expo
+	url = https://github.com/expo/skills

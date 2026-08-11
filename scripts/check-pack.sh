@@ -6,6 +6,7 @@ cd "$REPO"
 
 VENDOR_SKILL_EXCLUSIONS=(
   "vendor/agent-skills/skills/using-agent-skills"
+  "vendor/expo/plugins/expo/skills/expo-skill-feedback"
 )
 
 fail() {
@@ -23,6 +24,7 @@ published_prefix() {
 included_prefix() {
   case "$1" in
     agents|agents/*|design|design/*|documentation|documentation/*|engineering/*|general/*|git-ops|git-ops/*|mihaiserban.dev|mihaiserban.dev/*|research|research/*|vendor/*/skill*/*) return 0 ;;
+    vendor/expo/plugins/expo/skill*/*) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -41,6 +43,21 @@ done < <(
 
 included_skills=("${published_skills[@]}")
 for vendor_skills_dir in vendor/*/skill*/; do
+  [ -d "$vendor_skills_dir" ] || continue
+  while IFS= read -r line; do
+    skip=false
+    for excl in "${VENDOR_SKILL_EXCLUSIONS[@]}"; do
+      [ "$line" = "$excl" ] && skip=true && break
+    done
+    [ "$skip" = true ] && continue
+    included_skills+=("$line")
+  done < <(
+    find "$vendor_skills_dir" -name SKILL.md -not -path '*/.git/*' 2>/dev/null \
+      | sed 's#/SKILL.md$##' \
+      | sort
+  )
+done
+for vendor_skills_dir in vendor/expo/plugins/expo/skill*/; do
   [ -d "$vendor_skills_dir" ] || continue
   while IFS= read -r line; do
     skip=false

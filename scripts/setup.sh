@@ -17,6 +17,7 @@ echo ""
 
 VENDOR_SKILL_EXCLUSIONS=(
   "vendor/agent-skills/skills/using-agent-skills"
+  "vendor/expo/plugins/expo/skills/expo-skill-feedback"
 )
 
 # ── Helpers ──────────────────────────────────────────────────────────
@@ -34,7 +35,7 @@ is_codex()  {
 ensure_submodules() {
   if [ -f "$REPO_ROOT/.gitmodules" ]; then
     echo -e "${CYAN}Ensuring vendored skill packs...${NC}"
-    git -C "$REPO_ROOT" submodule update --init --recursive
+    git -C "$REPO_ROOT" submodule update --init --recursive || true
     echo ""
   fi
 }
@@ -123,6 +124,25 @@ done < <(
 )
 
 for vendor_skills_dir in "$REPO_ROOT"/vendor/*/skill*/; do
+  [ -d "$vendor_skills_dir" ] || continue
+  while IFS= read -r -d '' skill_md; do
+    skill_dir="$(dirname "$skill_md")"
+    rel="${skill_dir#$REPO_ROOT/}"
+    skip=false
+    for excl in "${VENDOR_SKILL_EXCLUSIONS[@]}"; do
+      [ "$rel" = "$excl" ] && skip=true && break
+    done
+    [ "$skip" = true ] && continue
+    SKILL_DIRS+=("$rel")
+  done < <(
+    find "$vendor_skills_dir" \
+      -name "SKILL.md" \
+      -not -path "*/.git/*" \
+      -print0 2>/dev/null | sort -z
+  )
+done
+
+for vendor_skills_dir in "$REPO_ROOT"/vendor/expo/plugins/expo/skill*/; do
   [ -d "$vendor_skills_dir" ] || continue
   while IFS= read -r -d '' skill_md; do
     skill_dir="$(dirname "$skill_md")"
