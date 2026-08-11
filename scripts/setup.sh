@@ -40,6 +40,56 @@ ensure_submodules() {
   fi
 }
 
+ensure_vendor_index() {
+  local skills_dir="$REPO_ROOT/skills"
+
+  echo -e "${CYAN}Building vendor skill index (skills/)...${NC}"
+
+  rm -rf "$skills_dir"
+  mkdir -p "$skills_dir"
+
+  local count=0 collisions=0
+  local seen=""
+
+  for vendor_root in "$REPO_ROOT"/vendor/*/skill*/ "$REPO_ROOT"/vendor/expo/plugins/expo/skill*/; do
+    [ -d "$vendor_root" ] || continue
+    while IFS= read -r -d '' skill_dir; do
+      local rel="${skill_dir#$REPO_ROOT/}"
+
+      local skip=false
+      for excl in "${VENDOR_SKILL_EXCLUSIONS[@]}"; do
+        [ "$rel" = "$excl" ] && skip=true && break
+      done
+      [ "$skip" = true ] && continue
+
+      local name="$(basename "$skill_dir")"
+
+      if echo ":$seen:" | grep -q ":$name:"; then
+        echo -e " ${YELLOW}⚠${NC}  collision: $name (skipping duplicate from $rel)"
+        collisions=$((collisions + 1))
+        continue
+      fi
+      seen="$seen:$name"
+
+      local target
+      target="$(python3 -c "import os.path; print(os.path.relpath('$skill_dir', '$skills_dir'))")"
+      ln -s "$target" "$skills_dir/$name"
+      echo "   • skills/$name → $target"
+      count=$((count + 1))
+    done < <(
+      find "$vendor_root" \
+        -mindepth 1 -maxdepth 1 -type d \
+        -not -path "*/.git/*" \
+        -exec test -f {}/SKILL.md \; \
+        -print0 2>/dev/null | sort -z
+    )
+  done
+
+  echo ""
+  echo -e " ${GREEN}✓${NC}  $count vendor skill(s) indexed, $collisions collision(s)"
+  echo ""
+}
+
 link_harness() {
   local label="$1" parent="$2" name="$3" harness_id="$4"
   local target="${parent}/${name}"
@@ -103,6 +153,10 @@ else
 fi
 
 echo ""
+
+# ── Phase 1.5: Vendor Skill Index ─────────────────────────────────────
+
+ensure_vendor_index
 
 # ── Phase 2: Generate Claude Code plugin.json ────────────────────────
 

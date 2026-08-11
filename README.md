@@ -26,7 +26,8 @@ It also initializes vendored skill-pack submodules before generating manifests.
 | **Codex** | `codex` on PATH | `~/.codex/skills/mihaiserban-skills/` → repo |
 
 Also auto-generates `.claude-plugin/plugin.json` so Claude Code discovers
-our skills plus included vendored skills.
+our skills plus included vendored skills, and `skills/` with flat symlinks so
+shallow-scanning agents (OpenCode) can discover vendored skills.
 
 ## Authored Skills
 
@@ -221,6 +222,7 @@ vendored submodules.
 │   ├── agent-skills/
 │   │   └── skills/        # git submodule, 21 external skills
 │   └── awesome-design-md/ # git submodule, DESIGN.md catalog
+├── skills/                  # generated: flat vendor symlinks for shallow-scanning agents
 ├── .claude-plugin/
 │   └── plugin.json
 ├── agents/

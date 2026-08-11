@@ -24,3 +24,6 @@ agents/governance-fanout/models/
 
 # Sandbox dirs created by eval runner
 **/eval-results/**/_sandbox/
+
+# Generated vendor skill index (symlinks, created by scripts/setup.sh)
+skills/

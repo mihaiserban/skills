@@ -61,7 +61,10 @@ Use the vocabulary in `docs/invocation.md`.
   a fallback or environment variable.
 - Keep third-party skill packs under `vendor/<name>` as git submodules rather
   than copying their files into published buckets.
-- Do not commit generated files such as `.DS_Store`, `__pycache__/`, or `*.pyc`.
+- Do not commit generated files such as `.DS_Store`, `__pycache__/`, `*.pyc`, or `skills/`.
+- `skills/` is a generated vendor skill index (symlinks to `vendor/`), created
+  by `scripts/setup.sh`. Agents that scan only shallow paths use it to discover
+  vendored skills. Add `skills/` to `.gitignore`.
 - If a skill is adapted from another repo, keep attribution in the skill file.
 
 ## Documentation Rules
